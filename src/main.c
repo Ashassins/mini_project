@@ -1,4 +1,10 @@
+#include "sound.h"
 #include "stm32f0xx.h"
+
 int main(void) {
-  for (;;);
+  setup_music();
+  start_music();
+  for (;;) {
+    asm volatile("wfi" ::);
+  }
 }
