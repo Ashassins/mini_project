@@ -6,6 +6,9 @@ void init_tim2();
 void init_tim16();
 void init_sound_dma();
 
+/*
+ * Invokes setup procedures for music module
+ */
 void setup_music() {
   melody_idx = 0;
   init_sound_tables();
@@ -15,24 +18,42 @@ void setup_music() {
   init_sound_dma();
 }
 
+/*
+ * Initialize all global values and start peripherals
+ */
 void start_music() {
   // Reset all of the global vars and enable the timers and dma
   melody_idx = 0;
   melody_select = 0;
-  melody_len = melody1_len;
   DAC->CR |= DAC_CR_EN1;
   DMA1_Channel2->CCR |= DMA_CCR_EN;
   TIM2->CR1 |= TIM_CR1_CEN;
   TIM16->CR1 |= TIM_CR1_CEN;
 }
 
+// Pause music peripherals
 void pause_music() {
   // Pause all of the timers related to music
   TIM2->CR1 &= ~TIM_CR1_CEN;
   TIM16->CR1 &= ~TIM_CR1_CEN;
+  DAC->CR &= ~DAC_CR_EN1;
   DMA1_Channel2->CCR &= ~DMA_CCR_EN;
 }
 
+// Restart music peripherals
+void resume_music() {
+  DAC->CR |= DAC_CR_EN1;
+  DMA1_Channel2->CCR |= DMA_CCR_EN;
+  TIM2->CR1 |= TIM_CR1_CEN;
+  TIM16->CR1 |= TIM_CR1_CEN;
+}
+
+/*
+ * Initialize tables needed for sound playback
+ *
+ * This function generates wavetable values for a triangle wave
+ * it also precomputes the ARR values for each melody
+ */
 void init_sound_tables() {
   // Sine wave
   //for (int i = 0; i < SAMPLES; i++) {
@@ -59,6 +80,10 @@ void init_sound_tables() {
   }
 }
 
+/*
+ * Initialize TIM2
+ * this one will trigger the DMA and DAC for sound generation
+ */
 void init_tim2() {
   RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
   // Disable timer
@@ -66,7 +91,6 @@ void init_tim2() {
   // Clear MMS and enable Update event
   TIM2->CR2 &= ~(TIM_CR2_MMS);
   TIM2->CR2 |= TIM_CR2_MMS_1;
-
   // Set no prescale for max arr freq
   TIM2->PSC = 0;
   // Calculate arr value for desired freq
@@ -77,6 +101,11 @@ void init_tim2() {
   TIM2->DIER |= TIM_DIER_UDE;
 }
 
+/*
+ * Initialize TIM16
+ * this timer is responsible for controlling note length,
+ * it will change based on a value from one of the noteDurations arrays
+ */
 void init_tim16() {
   RCC->APB2ENR |= RCC_APB2ENR_TIM16EN;
   RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
@@ -94,14 +123,19 @@ void init_tim16() {
   NVIC->ISER[0] |= 1 << TIM16_IRQn;
 }
 
+/*
+ * This interrupt handler changes notes
+ * and changes the time till it's next trigger for the next note
+ */
 void TIM16_IRQHandler() {
   // Ack the interrupt
   TIM16->SR &= ~TIM_SR_UIF;
-  TIM16->CR1 &= ~TIM_CR1_CEN;
   // Status led for lazy debug
   GPIOC->BSRR = GPIO_BSRR_BR_9 | (GPIO_BSRR_BS_9 & ~(GPIOC->ODR));
+
   melody_idx += 1;
   uint16_t nxt_note, nxt_dur;
+  // Select which note, from which melody to play from
   if (melody_select == 2) {
     if(melody_idx >= melody2_len) {
       melody_idx = 0;
@@ -126,7 +160,6 @@ void TIM16_IRQHandler() {
     }
   }
 
-
   // Needed to make sure we don't set the arr to zero on accident for a rest
   // note
   if (!nxt_note) {
@@ -134,9 +167,10 @@ void TIM16_IRQHandler() {
   } else {
     TIM2->CR1 |= TIM_CR1_CEN;
   }
+
+  // Set the pitch and duration values in the relavant timers
   TIM2->ARR = nxt_note;
   TIM16->ARR = nxt_dur;
-  TIM16->CR1 |= TIM_CR1_CEN;
 }
 
 void init_sound_dma() {

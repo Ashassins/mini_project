@@ -10,7 +10,6 @@ extern uint16_t wavetable[SAMPLES];
 
 extern uint16_t melody_idx;
 extern uint8_t melody_select;
-extern uint8_t melody_len;
 
 extern uint16_t melody1[];
 extern uint16_t melody2[];
@@ -25,5 +24,6 @@ extern const uint16_t melody2_len;
 void setup_music();
 void start_music();
 void pause_music();
+void resume_music();
 
 #endif
