@@ -34,8 +34,17 @@ void pause_music() {
 }
 
 void init_sound_tables() {
-  for (int i = 0; i < SAMPLES; i++) {
-    wavetable[i] = 2048 + 1952 * sin(2 * M_PI * i / SAMPLES);
+  // Sine wave
+  //for (int i = 0; i < SAMPLES; i++) {
+  //  wavetable[i] = 2048 + 1952 * sin(2 * M_PI * i / SAMPLES);
+  //}
+  // Sawtooth
+  //for(int i = 0; i < SAMPLES; i++) {
+  //  wavetable[i] = 2048 + 1952 * (2 * ((float)i/SAMPLES) - 1);
+  //}
+  // Triangle wave
+  for(int i = 0; i < SAMPLES; i++) {
+    wavetable[i] = 2048 + 1952 * (1 - fabs((float)i/SAMPLES - 0.5)*4);
   }
   // Precompute ARR values for each note
   for (int i = 0; i < melody1_len; i++) {
