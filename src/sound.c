@@ -19,7 +19,7 @@ void start_music() {
   // Reset all of the global vars and enable the timers and dma
   melody_idx = 0;
   melody_select = 0;
-
+  melody_len = melody1_len;
   DAC->CR |= DAC_CR_EN1;
   DMA1_Channel2->CCR |= DMA_CCR_EN;
   TIM2->CR1 |= TIM_CR1_CEN;
@@ -47,7 +47,7 @@ void init_sound_tables() {
 }
 
 void init_tim2() {
-  RCC->APB1ENR  |= RCC_APB1ENR_TIM2EN;
+  RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
   // Disable timer
   TIM2->CR1 &= ~(TIM_CR1_CEN);
   // Clear MMS and enable Update event
@@ -66,7 +66,7 @@ void init_tim2() {
 
 void init_tim16() {
   RCC->APB2ENR |= RCC_APB2ENR_TIM16EN;
-  RCC->AHBENR|= RCC_AHBENR_GPIOCEN;
+  RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
   GPIOC->MODER &= ~GPIO_MODER_MODER9;
   GPIOC->MODER |= GPIO_MODER_MODER9_0;
   TIM16->CR1 &= ~TIM_CR1_CEN;
@@ -82,35 +82,33 @@ void init_tim16() {
 }
 
 void TIM16_IRQHandler() {
+  // Ack the interrupt
   TIM16->SR &= ~TIM_SR_UIF;
-  if (GPIOC->ODR & (1<<9))
-    GPIOC->BRR = 1<<9;
-  else
-    GPIOC->BSRR = 1<<9;
+  // Status led for lazy debug
+  GPIOC->BSRR = GPIO_BSRR_BR_9 | (GPIO_BSRR_BS_9 & ~(GPIOC->ODR));
   melody_idx += 1;
-  if (melody_select < 2) {
-    if(melody_idx >= melody1_len) {
+  uint16_t *mel_arr, *dur_arr;
+  if(melody_select == 0 || melody_select == 1) {
+    if (melody_idx >= melody1_len) {
       melody_idx = 0;
       melody_select++;
     }
+    mel_arr = melody1;
+    dur_arr = noteDurations1;
   }
-  else if (melody_select == 2) {
-    if(melody_idx >= melody2_len) {
-      melody_select = 0;
-      melody_idx = 0;
-    }
-  } else {
-    melody_idx = 0;
-    melody_select = 0;
-  }
-
   if (melody_select == 2) {
-    TIM2->ARR = melody1[melody_idx];
-    TIM16->ARR = noteDurations1[melody_idx] * 800;
-  } else {
-    TIM2->ARR = melody2[melody_idx];
-    TIM16->ARR = noteDurations1[melody_idx] * 800;
+    if(melody_idx >= melody2_len) {
+      melody_idx = 0;
+      melody_select = 0;
+      mel_arr = melody1;
+      dur_arr = noteDurations1;
+    } else {
+      mel_arr = melody2;
+      dur_arr = noteDurations2;
+    }
   }
+  TIM2->ARR = mel_arr[melody_idx];
+  TIM16->ARR = dur_arr[melody_idx];
 }
 
 void init_sound_dma() {
@@ -122,11 +120,13 @@ void init_sound_dma() {
   // We want to copy SAMPLES elements
   dma->CNDTR = SAMPLES;
   // from array
-  dma->CMAR = (uint32_t) wavetable;
+  dma->CMAR = (uint32_t)wavetable;
   // to the right aligned 12 bit dac
-  dma->CPAR = (uint32_t) &DAC->DHR12R1;
-  // Setup dma for circular, mem to periph, increment memory, set msize to 16 and psize to 16
-  dma->CCR |= DMA_CCR_CIRC | DMA_CCR_DIR | DMA_CCR_MINC | DMA_CCR_MSIZE_0 | DMA_CCR_PSIZE_0;
+  dma->CPAR = (uint32_t)&DAC->DHR12R1;
+  // Setup dma for circular, mem to periph, increment memory, set msize to 16
+  // and psize to 16
+  dma->CCR |= DMA_CCR_CIRC | DMA_CCR_DIR | DMA_CCR_MINC | DMA_CCR_MSIZE_0 |
+              DMA_CCR_PSIZE_0;
 }
 
 void init_dac() {
@@ -134,11 +134,9 @@ void init_dac() {
   // Configure which TRGO event to fire on and enable the dac
   DAC->CR &= ~(DAC_CR_TSEL1);
   DAC->CR |= DAC_CR_TSEL1_2;
-
 }
 
-
-uint32_t melody1[] = {
+uint16_t melody1[] = {
     NOTE_E5, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_D5, NOTE_C5,
     NOTE_B4, NOTE_A4, NOTE_A4, NOTE_C5, NOTE_E5, NOTE_D5, NOTE_C5,
     NOTE_B4, NOTE_E4, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_C5,
@@ -148,7 +146,7 @@ uint32_t melody1[] = {
     NOTE_B4, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_C5, NOTE_A4, NOTE_A4,
 };
 
-uint32_t melody2[] = {
+uint16_t melody2[] = {
     NOTE_E4, NOTE_C4,  NOTE_A3,  NOTE_C4,  NOTE_E4, NOTE_C4, NOTE_A3,  NOTE_C4,
     NOTE_D4, NOTE_B3,  NOTE_GS3, NOTE_B3,  NOTE_D4, NOTE_B3, NOTE_GS3, NOTE_B3,
     NOTE_C4, NOTE_A3,  NOTE_E3,  NOTE_A3,  NOTE_C4, NOTE_A3, NOTE_E3,  NOTE_A3,
@@ -156,11 +154,15 @@ uint32_t melody2[] = {
     NOTE_C4, NOTE_E4,  NOTE_C4,  NOTE_A3,  NOTE_C4, NOTE_D4, NOTE_B3,  NOTE_GS3,
     NOTE_B3, NOTE_D4,  NOTE_B3,  NOTE_GS3, NOTE_B3, NOTE_C4, NOTE_A3,  NOTE_C4,
     NOTE_E4, NOTE_A4,  NOTE_A4,  NOTE_GS4};
+
 uint16_t wavetable[SAMPLES];
-uint16_t melody_idx = 0;
-uint8_t melody_select = 1;
-const uint16_t melody1_len = sizeof(melody1) / sizeof(uint32_t);
-const uint16_t melody2_len = sizeof(melody2) / sizeof(uint32_t);
+
+uint16_t melody_idx;
+uint8_t melody_select;
+uint8_t melody_len;
+
+const uint16_t melody1_len = sizeof(melody1) / sizeof(melody1[0]);
+const uint16_t melody2_len = sizeof(melody2) / sizeof(melody2[0]);
 
 const uint16_t noteDurations1[] = {
     320, 160, 160, 160, 80,  80,  160, 160, 320, 160, 160, 320, 160,
@@ -173,4 +175,3 @@ const uint16_t noteDurations2[] = {
     160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160,
     160, 160, 640, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160,
     160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 320, 320};
-

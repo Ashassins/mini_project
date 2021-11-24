@@ -5,14 +5,15 @@
 #include <math.h>
 #include <stdint.h>
 
-#define SAMPLES 60
+#define SAMPLES 50
 extern uint16_t wavetable[SAMPLES];
 
 extern uint16_t melody_idx;
 extern uint8_t melody_select;
+extern uint8_t melody_len;
 
-extern uint32_t melody1[];
-extern uint32_t melody2[];
+extern uint16_t melody1[];
+extern uint16_t melody2[];
 
 // How long to hold each note for in ms
 extern const uint16_t noteDurations1[];
