@@ -207,11 +207,11 @@ const uint16_t wavetable[SAMPLES] = {
 };
 
 const uint16_t melody1[] = {
-    NOTE_E5,    NOTE_E5,    NOTE_C5,      NOTE_D5,
-    NOTE_C5,    NOTE_B4,    NOTE_A4,      NOTE_A4,
-    NOTE_C5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
-    NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
-    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ REST,
+    NOTE_B0,    NOTE_C1,    NOTE_CS1,      NOTE_D1,
+    NOTE_DS1,    NOTE_E1,    NOTE_F1,      NOTE_FS1,
+    NOTE_G1,    NOTE_GS1,    NOTE_A1,      NOTE_AS1,
+    NOTE_B1,    NOTE_C2,    NOTE_CS2,      NOTE_D2,
+    REST,    REST,    REST, /**/ REST,
     NOTE_D5,    NOTE_F5,    NOTE_A3,      NOTE_G5,
     NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
     NOTE_D5,    NOTE_C5,    NOTE_B4,      NOTE_B4,
