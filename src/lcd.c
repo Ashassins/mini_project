@@ -349,8 +349,40 @@ __attribute((weak)) void init_lcd_spi(void)
     printf("init_lcd_spi() not defined.");
 }
 
+void init_spi1_slow(void) {
+    GPIOB->MODER |= 0x2 << (3 * 2);
+    GPIOB->MODER |= 0x2 << (4 * 2);
+    GPIOB->MODER |= 0x2 << (5 * 2);
+    // PB3: AF0
+    GPIOB->AFR[0] &= ~(0xf << (4*(3)));
+    GPIOB->AFR[0] |=   0x0 << (4*(3));
+    // PB4: AF0
+    GPIOB->AFR[0] &= ~(0xf << (4*(4)));
+    GPIOB->AFR[0] |=   0x0 << (4*(4));
+    // PB5: AF0
+    GPIOB->AFR[0] &= ~(0xf << (4*(5)));
+    GPIOB->AFR[0] |=   0x0 << (4*(5));
+    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+    SPI1->CR1 |= SPI_CR1_BR;
+    SPI1->CR1 |= SPI_CR1_MSTR;
+    SPI1->CR1 |= SPI_CR1_SSM;
+    SPI1->CR1 |= SPI_CR1_SSI;
+    SPI1->CR2 = SPI_CR2_DS_1 | SPI_CR2_DS_2 | SPI_CR2_DS_3 | SPI_CR2_FRXTH;
+    SPI1->CR1 |= SPI_CR1_SPE;
+}
+
+void init_lcd_sqi(void) {
+    // 8,11,14 as GPIO Out
+    // Enable RCC to GPIOB
+    RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+    GPIOB->MODER |= 0x1 << (8 * 2);
+    GPIOB->MODER |= 0x1 << (11 * 2);
+    GPIOB->MODER |= 0x1 << (14 * 2);
+    init_spi1_slow();
+}
+
 void LCD_Setup() {
-    init_lcd_spi();
+    init_lcd_spi();GPIOB->MODER |= 0x2 << (3 * 2);
     tft_select(0);
     tft_reset(0);
     tft_reg_select(0);
