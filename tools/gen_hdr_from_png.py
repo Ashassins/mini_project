@@ -2,51 +2,74 @@ from typing import List, Tuple
 from PIL import Image
 
 def px2u16(px: List[int]) -> int:
-    r = (px[1] / 255) * ((1 << 6) - 1)
-    g = (px[2] / 255) * ((1 << 7) - 1)
-    b = (px[3] / 255) * ((1 << 6) - 1)
+    r = (px[0] / 255) * ((1 << 6 - 1) - 1)
+    g = (px[1] / 255) * ((1 << 7 - 1) - 1)
+    b = (px[2] / 255) * ((1 << 6 - 1) - 1)
     rv = int(r)
     rv = rv << 6 | int(g)
     rv = rv << 5 | int(b)
     return rv
 
 
-def load_img(path: str) -> List[int]:
+def load_img(path: str) -> Tuple[List[int], Tuple[int, int]]:
     im = Image.open(path)
     px = im.load()
     img = []
     for i in range(im.size[0]):
         for j in range(im.size[1]):
             img.append(px2u16(px[i, j]))
-    return img
+    return img, im.size
 
 def dump_img_arr(path: str) -> Tuple[str, str]:
-    img = load_img(path)
+    img, img_sz = load_img(path)
     name = path.split("/")[-1].split(".")[0].lower()
-    c_arr = ""
-    c_arr += f"const uint16_t {name}[{len(img)}] = {{\n\t"
+    c_str_data = ""
+    c_str_data += f"const uint16_t {name}[{len(img)}] = {{\n\t"
     for i, px in enumerate(img):
-        c_arr += f"{hex(px)}, "
+        c_str_data += f"{hex(px)}, "
         if i % 5 == 4:
-            c_arr += "\n\t"
+            c_str_data += "\n\t"
 
-    c_arr += "\n};"
-    return c_arr, f"extern const uint16_t {name}[{len(img)}];"
+    c_str_data += "\n};\n"
+    c_str_data += f"extern const uint8_t {name}_width = {img_sz[0]};\n"
+    c_str_data += f"extern const uint8_t {name}_height = {img_sz[1]};\n"
+
+    hdr_str = f"extern const uint16_t {name}[{len(img)}];\n"
+    hdr_str += f"extern const uint8_t {name}_width;\n"
+    hdr_str += f"extern const uint8_t {name}_height;\n"
+    return c_str_data, hdr_str
 
 if __name__ == "__main__":
     from sys import argv
-    hdr = """#ifndef INVADERS_H
-#define INVADERS_H
+    import os
+    from os import path
+    from glob import glob
+    cwd = os.getcwd().split('/')
+
+    proj_dir = "/"
+    for p in cwd:
+        proj_dir = path.join(proj_dir, p)
+        if p == "mini_project":
+            break
+
+    hdr = """#ifndef SPRITES_H
+#define SPRITES_H
 #include <stdint.h>"""
-    c_file = '#include "invaders.h"\n'
-    for path in argv[1:]:
-        c_data, hdr_data = dump_img_arr(path)
+    c_file = '#include "sprites.h"\n'
+
+    files = sorted(glob(path.join(proj_dir, "Assets", "*.png")))
+
+
+    for f in files:
+        c_data, hdr_data = dump_img_arr(f)
         hdr += "\n" + hdr_data
         c_file += "\n" + c_data
 
     hdr += "\n#endif"
-    with open("invaders_dat.h", "w") as f:
+    hdr_path = path.join(proj_dir, "inc", "sprites.h")
+    with open(hdr_path, "w") as f:
         f.write(hdr)
 
-    with open("invaders_dat.c", "w") as f:
+    src_path = path.join(proj_dir, "src", "sprites.c")
+    with open(src_path, "w") as f:
         f.write(c_file)
