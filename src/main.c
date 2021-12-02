@@ -27,9 +27,12 @@ int main(void) {
     .sprite_data = (uint16_t *) invader1_a,
     .sprite_swap_key = ((uint32_t) invader1_a) ^ ((uint32_t)invader1_b)
   };
+  init_invaders();
   for (;;) {
     draw_sprite(&invader);
     invader.sprite_data = (uint16_t *) (((uint32_t) invader.sprite_data) ^ invader.sprite_swap_key);
+    draw_invaders();
+    update_invaders();
     nano_wait(500000000);
     //asm volatile("wfi" ::);
   }
