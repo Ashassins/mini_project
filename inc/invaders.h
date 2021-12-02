@@ -10,7 +10,8 @@
 #define INVADERS_SPRITE_COUNT 4
 
 typedef struct {
-  uint16_t x,y;
+  // This is the bottom right corner of the
+  uint16_t x, y;
   uint16_t width, height;
   int8_t step;
   uint8_t units[INVADERS_COUNT];

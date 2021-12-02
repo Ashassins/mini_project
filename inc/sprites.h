@@ -5,7 +5,7 @@
 
 typedef struct {
   // The bottom right corner of the sprite
-  uint16_t x,y;
+  uint16_t x, y;
   // The offset to the top left corner of the sprite from x,y
   uint16_t width, height;
   // The pointer to the data to draw the sprite
