@@ -100,63 +100,7 @@ void LCD_Reset(void) {
   nano_wait(50000000);  // Wait
 }
 
-// If you want to try the slower version of SPI, #define SLOW_SPI
 
-#if defined(SLOW_SPI)
-
-// What GPIO port and SPI channel are we using here?
-#define CSPORT GPIOB
-#define LCD_CS 10 /* also known as NSS */
-#define RSPORT GPIOA
-#define LCD_RS 3
-#define RESETPORT GPIOB
-#define LCD_RESET 11
-
-#define LCD_CS_SET                                                             \
-  do {                                                                         \
-    while ((SPI->SR & SPI_SR_BSY) != 0)                                        \
-      ;                                                                        \
-    CSPORT->BSRR = 1 << LCD_CS;                                                \
-  } while (0)
-#define LCD_RS_SET RSPORT->BSRR = 1 << LCD_RS
-#define LCD_RESET_SET RESETPORT->BSRR = 1 << LCD_RESET
-
-#define LCD_CS_CLR CSPORT->BRR = 1 << LCD_CS
-#define LCD_RS_CLR RSPORT->BRR = 1 << LCD_RS
-#define LCD_RESET_CLR RESETPORT->BRR = 1 << LCD_RESET
-
-// Write a byte to SPI.
-void SPI_WriteByte(uint8_t Data) {
-  while ((SPI->SR & SPI_SR_TXE) == 0)
-    ;
-  *((uint8_t *)&SPI->DR) = Data;
-}
-
-// Write to an LCD "register"
-void LCD_WR_REG(uint8_t data) {
-  lcddev.reg_select(1);
-  SPI_WriteByte(data);
-}
-
-// Write 8-bit data to the LCD
-void LCD_WR_DATA(uint8_t data) {
-  lcddev.reg_select(0);
-  SPI_WriteByte(data);
-}
-
-// Prepare to write 16-bit data to the LCD
-void LCD_WriteData16_Prepare() { lcddev.reg_select(0); }
-
-// Write 16-bit data
-void LCD_WriteData16(u16 Data) {
-  SPI_WriteByte(Data >> 8);
-  SPI_WriteByte(Data);
-}
-
-// Finish writing 16-bit data
-void LCD_WriteData16_End() {}
-
-#else  /* not SLOW_SPI */
 
 // Write to an LCD "register"
 void LCD_WR_REG(uint8_t data) {
@@ -193,7 +137,6 @@ void LCD_WriteData16(u16 data) {
 void LCD_WriteData16_End() {
   SPI->CR2 &= ~SPI_CR2_DS; // bad value forces it back to 8-bit mode
 }
-#endif /* not SLOW_SPI */
 
 // Select an LCD "register" and write 8-bit data to it.
 void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue) {
@@ -240,8 +183,7 @@ void LCD_direction(u8 direction) {
 }
 
 // Do the initialization sequence for the display.
-void LCD_Init(void (*reset)(int), void (*select)(int),
-              void (*reg_select)(int)) {
+void LCD_Init(void (*reset)(int), void (*select)(int), void (*reg_select)(int)) {
   lcddev.reset = tft_reset;
   lcddev.select = tft_select;
   lcddev.reg_select = tft_reg_select;
@@ -396,8 +338,7 @@ void LCD_Setup() {
 // Select a subset of the display to work on, and issue the "Write RAM"
 // command to prepare to send pixel data to it.
 //===========================================================================
-void LCD_SetWindow(uint16_t xStart, uint16_t yStart, uint16_t xEnd,
-                   uint16_t yEnd) {
+void LCD_SetWindow(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd) {
   LCD_WR_REG(lcddev.setxcmd);
   LCD_WR_DATA(xStart >> 8);
   LCD_WR_DATA(0x00FF & xStart);
@@ -606,8 +547,7 @@ static void _swap(u16 *a, u16 *b) {
 //===========================================================================
 // Draw a filled triangle of color c with vertices at (x0,y0), (x1,y1), (x2,y2).
 //===========================================================================
-void LCD_DrawFillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2,
-                          u16 c) {
+void LCD_DrawFillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 c) {
   lcddev.select(1);
   u16 a, b, y, last;
   int dx01, dy01, dx02, dy02, dx12, dy12;
@@ -1121,8 +1061,7 @@ void LCD_DrawChar(u16 x, u16 y, u16 fc, u16 bc, char num, u8 size, u8 mode) {
 // size is the height of the character (either 12 or 16)
 // When mode is set, the background will be transparent.
 //===========================================================================
-void LCD_DrawString(u16 x, u16 y, u16 fc, u16 bg, const char *p, u8 size,
-                    u8 mode) {
+void LCD_DrawString(u16 x, u16 y, u16 fc, u16 bg, const char *p, u8 size, u8 mode) {
   lcddev.select(1);
   while ((*p <= '~') && (*p >= ' ')) {
     if (x > (lcddev.width - 1) || y > (lcddev.height - 1))
@@ -1142,14 +1081,10 @@ void LCD_DrawPicture(u16 x0, u16 y0, const Picture *pic) {
   u16 x1 = x0 + pic->width - 1;
   u16 y1 = y0 + pic->height - 1;
   // No error handling.  Just loop forever if out-of-bounds.
-  while (x0 >= lcddev.width)
-    ;
-  while (x1 >= lcddev.width)
-    ;
-  while (y0 >= lcddev.height)
-    ;
-  while (y1 >= lcddev.height)
-    ;
+  if (x0 >= lcddev.width || x1 >= lcddev.width || y0 >= lcddev.height || y1 >= lcddev.height) {
+    GPIOC->BSRR = GPIO_BSRR_BS_6;
+    for(;;);
+  }
   LCD_SetWindow(x0, y0, x1, y1);
   LCD_WriteData16_Prepare();
 

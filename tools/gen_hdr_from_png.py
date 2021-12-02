@@ -31,8 +31,8 @@ def dump_img_arr(path: str) -> Tuple[str, str]:
             c_str_data += "\n\t"
 
     c_str_data += "\n};\n"
-    c_str_data += f"extern const uint8_t {name}_width = {img_sz[0]};\n"
-    c_str_data += f"extern const uint8_t {name}_height = {img_sz[1]};\n"
+    c_str_data += f"const uint8_t {name}_width = {img_sz[0]};\n"
+    c_str_data += f"const uint8_t {name}_height = {img_sz[1]};\n"
 
     hdr_str = f"extern const uint16_t {name}[{len(img)}];\n"
     hdr_str += f"extern const uint8_t {name}_width;\n"
@@ -52,10 +52,10 @@ if __name__ == "__main__":
         if p == "mini_project":
             break
 
-    hdr = """#ifndef SPRITES_H
-#define SPRITES_H
+    hdr = """#ifndef SPRITE_DATA_H
+#define SPRITE_DATA_H
 #include <stdint.h>"""
-    c_file = '#include "sprites.h"\n'
+    c_file = '#include "sprite_data.h"\n'
 
     files = sorted(glob(path.join(proj_dir, "Assets", "*.png")))
 
@@ -66,10 +66,10 @@ if __name__ == "__main__":
         c_file += "\n" + c_data
 
     hdr += "\n#endif"
-    hdr_path = path.join(proj_dir, "inc", "sprites.h")
+    hdr_path = path.join(proj_dir, "inc", "sprite_data.h")
     with open(hdr_path, "w") as f:
         f.write(hdr)
 
-    src_path = path.join(proj_dir, "src", "sprites.c")
+    src_path = path.join(proj_dir, "src", "sprite_data.c")
     with open(src_path, "w") as f:
         f.write(c_file)
