@@ -7,7 +7,7 @@ void draw_sprite(Sprite *s) {
   LCD_WriteData16_Prepare();
   for (int y = s->height - 1; y >= 0; y--) {
     for (int x = s->width - 1; x >= 0; x--) {
-      LCD_WriteData16(s->sprite_data[y + x * s->height]);
+      LCD_WriteData16(s->sprite_data[x + y * s->width]);
     }
   }
 

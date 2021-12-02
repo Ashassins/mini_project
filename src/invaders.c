@@ -68,17 +68,17 @@ void draw_invaders() {
           case 1:
             LCD_WriteData16(
                 invaders
-                    .unit_sprites[0][sprite_y + sprite_x * invader1_a_height]);
+                    .unit_sprites[0][sprite_x + sprite_y * invader1_a_width]);
             break;
           case 2:
             LCD_WriteData16(
                 invaders
-                    .unit_sprites[1][sprite_y + sprite_x * invader1_a_height]);
+                    .unit_sprites[1][sprite_x + sprite_y * invader1_a_width]);
             break;
           case 3:
             LCD_WriteData16(
                 invaders
-                    .unit_sprites[2][sprite_y + sprite_x * invader1_a_height]);
+                    .unit_sprites[2][sprite_x + sprite_y * invader1_a_width]);
             break;
           default:
             LCD_WriteData16(0);
