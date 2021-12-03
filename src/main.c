@@ -3,6 +3,8 @@
 #include "sound.h"
 #include "sprite_data.h"
 #include "sprites.h"
+#include "nunchuk.h"
+#include "string.h"
 #include "stm32f0xx.h"
 
 // TODO This should be replaced with global tick, maybe use SysTick and check it
@@ -31,7 +33,12 @@ int main(void) {
                         ((uint32_t)invader1_a) ^ ((uint32_t)invader1_b)};
   // Initialize the invader army
   init_invaders();
+  // Init i2c and nunchuk
+  init_nunchuk();
   for (;;) {
+
+    print_nunchuck_xy(100, 100);
+
     // Draw the test sprite
     draw_sprite(&invader);
     // Change ("animate") the test sprite
@@ -43,6 +50,6 @@ int main(void) {
     update_invaders();
     // Wait like a dum-dum because we dont have a global tick setup yet
     nano_wait(500000000);
-    // asm volatile("wfi" ::);
+     asm volatile("wfi" ::);
   }
 }

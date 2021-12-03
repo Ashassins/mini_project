@@ -1,4 +1,5 @@
 #include "stm32f0xx.h"
+#include "lcd.h"
 #include <string.h> // for memset() declaration
 #include <math.h>   // for MA_PI
 
@@ -394,6 +395,7 @@ void nano_wait(unsigned int n) {
 //}
 
 void init_nunchuk(void) {
+    init_i2c();
     uint8_t init_data_1[2] = {0xF0, 0x55};
     i2c_senddata(0x52, init_data_1, 2);
     uint8_t init_data_2[2] = {0xFB, 0x00};
@@ -405,6 +407,23 @@ void read_nunchuk(uint8_t *buffer) {
     i2c_senddata(0x52, addr, 1);
     nano_wait(200000);
     i2c_recvdata(0x52, buffer, 8);
+}
+
+void print_nunchuck_xy(int x, int y) {
+    uint8_t buffer[8] = {0};
+    memset(buffer, 0, 8);
+    read_nunchuk(buffer);
+    char output_x[10] = "x:   ";
+    char output_y[10] = " y:   ";
+    char full_out[20] = "";
+    LCD_DrawString(100,100,0xFFFF,0x0000, "           ", 16, 0);
+    int n_x = buffer[0];
+    int n_y = buffer[1];
+    itoa(n_x, &output_x[2], 10);
+    itoa(n_y, &output_y[3], 10);
+    strcat(full_out, output_x);
+    strcat(full_out, output_y);
+    LCD_DrawString(x,y,0xFFFF,0x0000, full_out, 16, 0);
 }
 
 
