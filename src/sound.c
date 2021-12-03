@@ -6,6 +6,11 @@ void init_tim2();
 void init_tim16();
 void init_sound_dma();
 
+uint16_t melody_idx;
+uint8_t melody_select;
+const uint16_t melody1_len = sizeof(melody1) / sizeof(melody1[0]);
+const uint16_t melody2_len = sizeof(melody2) / sizeof(melody2[0]);
+
 /*
  * Invokes setup procedures for music module
  */
@@ -49,38 +54,6 @@ void resume_music() {
 }
 
 /*
- * Initialize tables needed for sound playback
- *
- * This function generates wavetable values for a triangle wave
- * it also precomputes the ARR values for each melody
- */
-void init_sound_tables() {
-  // Sine wave
-  // for (int i = 0; i < SAMPLES; i++) {
-  //  wavetable[i] = 2048 + 1952 * sin(2 * M_PI * i / SAMPLES);
-  //}
-  // Sawtooth
-  // for(int i = 0; i < SAMPLES; i++) {
-  //  wavetable[i] = 2048 + 1952 * (2 * ((float)i/SAMPLES) - 1);
-  //}
-  // Triangle wave
-  // for (int i = 0; i < SAMPLES; i++) {
-  //  wavetable[i] = 2048 + 1952 * (1 - fabs((float)i / SAMPLES - 0.5) * 4);
-  //}
-  // Precompute ARR values for each note
-  // for (int i = 0; i < melody1_len; i++) {
-  //  if (melody1[i] != 0) {
-  //    melody1[i] = (48000000 / (melody1[i] * SAMPLES)) - 1;
-  //  }
-  //}
-  // for (int i = 0; i < melody2_len; i++) {
-  //  if (melody2[i] != 0) {
-  //    melody2[i] = (48000000 / (melody2[i] * SAMPLES)) - 1;
-  //  }
-  //}
-}
-
-/*
  * Initialize TIM2
  * this one will trigger the DMA and DAC for sound generation
  */
@@ -117,10 +90,35 @@ void init_tim16() {
   TIM16->CR2 |= TIM_CR2_MMS_1;
 
   TIM16->PSC = 48000 - 1;
-  TIM16->ARR = noteDurations1[melody_idx] - 1;
+  TIM16->ARR = noteDurations1[melody_idx]; //- 1;
   TIM16->CR1 |= TIM_CR1_ARPE;
   TIM16->DIER |= TIM_DIER_UIE;
   NVIC->ISER[0] |= 1 << TIM16_IRQn;
+}
+
+void init_dac() {
+  RCC->APB1ENR |= RCC_APB1ENR_DACEN;
+  // Configure which TRGO event to fire on and enable the dac
+  DAC->CR &= ~(DAC_CR_TSEL1);
+  DAC->CR |= DAC_CR_TSEL1_2;
+}
+
+void init_sound_dma() {
+  RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+
+  DMA_Channel_TypeDef *dma = DMA1_Channel2;
+  // Disable DMA and clear msize and psize
+  dma->CCR &= ~(DMA_CCR_EN | DMA_CCR_MSIZE | DMA_CCR_PSIZE);
+  // We want to copy SAMPLES elements
+  dma->CNDTR = SAMPLES;
+  // from array
+  dma->CMAR = (uint32_t)wavetable;
+  // to the right aligned 12 bit dac
+  dma->CPAR = (uint32_t)&DAC->DHR12R1;
+  // Setup dma for circular, mem to periph, increment memory, set msize to 16
+  // and psize to 16
+  dma->CCR |= DMA_CCR_CIRC | DMA_CCR_DIR | DMA_CCR_MINC | DMA_CCR_MSIZE_0 |
+              DMA_CCR_PSIZE_0;
 }
 
 /*
@@ -135,7 +133,15 @@ void TIM16_IRQHandler() {
 
   melody_idx += 1;
   uint16_t nxt_note, nxt_dur;
+  if (melody_idx >= melody1_len) {
+      melody_idx = 0;
+      //melody_select++;
+  }
+  nxt_note = melody1[melody_idx];
+  nxt_dur = noteDurations1[melody_idx];
+  
   // Select which note, from which melody to play from
+  /*
   if (melody_select == 2) {
     if (melody_idx >= melody2_len) {
       melody_idx = 0;
@@ -158,7 +164,7 @@ void TIM16_IRQHandler() {
       nxt_note = melody1[melody_idx];
       nxt_dur = noteDurations1[melody_idx];
     }
-  }
+  }//*/
 
   // Needed to make sure we don't set the arr to zero on accident for a rest
   // note
@@ -171,31 +177,6 @@ void TIM16_IRQHandler() {
   // Set the pitch and duration values in the relavant timers
   TIM2->ARR = nxt_note;
   TIM16->ARR = nxt_dur;
-}
-
-void init_sound_dma() {
-  RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-
-  DMA_Channel_TypeDef *dma = DMA1_Channel2;
-  // Disable DMA and clear msize and psize
-  dma->CCR &= ~(DMA_CCR_EN | DMA_CCR_MSIZE | DMA_CCR_PSIZE);
-  // We want to copy SAMPLES elements
-  dma->CNDTR = SAMPLES;
-  // from array
-  dma->CMAR = (uint32_t)wavetable;
-  // to the right aligned 12 bit dac
-  dma->CPAR = (uint32_t)&DAC->DHR12R1;
-  // Setup dma for circular, mem to periph, increment memory, set msize to 16
-  // and psize to 16
-  dma->CCR |= DMA_CCR_CIRC | DMA_CCR_DIR | DMA_CCR_MINC | DMA_CCR_MSIZE_0 |
-              DMA_CCR_PSIZE_0;
-}
-
-void init_dac() {
-  RCC->APB1ENR |= RCC_APB1ENR_DACEN;
-  // Configure which TRGO event to fire on and enable the dac
-  DAC->CR &= ~(DAC_CR_TSEL1);
-  DAC->CR |= DAC_CR_TSEL1_2;
 }
 
 const uint16_t wavetable[SAMPLES] = {
@@ -218,9 +199,7 @@ const uint16_t melody1[] = {// 19
     NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_C5,
     NOTE_A4,    NOTE_A4,/**/NOTE_E5,      NOTE_B4, // 21
     NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_D5,
-    NOTE_C5,    NOTE_B4,    NOTE_A4,      NOTE_A4
-};
-
+    NOTE_C5,    NOTE_B4,    NOTE_A4,      NOTE_A4};
 const uint16_t melody2[] = {
     NOTE_C5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
     NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
@@ -234,12 +213,6 @@ const uint16_t melody2[] = {
     NOTE_A4,    NOTE_GS4,   NOTE_B4, /**/ NOTE_E5, //9
     NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
     NOTE_E5,    NOTE_A5,    NOTE_A5,      NOTE_GS5/**/};
-
-uint16_t melody_idx;
-uint8_t melody_select;
-
-const uint16_t melody1_len = sizeof(melody1) / sizeof(melody1[0]);
-const uint16_t melody2_len = sizeof(melody2) / sizeof(melody2[0]);
 
 // 19 19 21 20 8 9
 const uint16_t noteDurations1[] = {
