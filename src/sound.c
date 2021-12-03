@@ -207,12 +207,12 @@ const uint16_t wavetable[SAMPLES] = {
 };
 
 const uint16_t melody1[] = {
-    NOTE_E5,    NOTE_E5,    NOTE_C5,      NOTE_D5,
+    NOTE_E5,    NOTE_B4,    NOTE_C5,      NOTE_D5,
     NOTE_C5,    NOTE_B4,    NOTE_A4,      NOTE_A4,
     NOTE_C5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
     NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
     NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ REST,
-    NOTE_D5,    NOTE_F5,    NOTE_A3,      NOTE_G5,
+    NOTE_D5,    NOTE_F5,    NOTE_A5,      NOTE_G5,
     NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
     NOTE_D5,    NOTE_C5,    NOTE_B4,      NOTE_B4,
     NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_C5,
@@ -240,19 +240,19 @@ const uint16_t melody1[] = {
 };
 
 const uint16_t melody2[] = {
-    NOTE_E5,    NOTE_E5,    NOTE_C5,      NOTE_D5,
-    NOTE_C5,    NOTE_B4,    NOTE_A4,      NOTE_A4,
-    NOTE_C5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
-    NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
-    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ REST,
-    NOTE_D5,    NOTE_F5,    NOTE_A3,      NOTE_G5,
-    NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
-    NOTE_D5,    NOTE_C5,    NOTE_B4,      NOTE_B4,
-    NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_C5,
-    NOTE_A4,    NOTE_A4,/**/NOTE_E5,      NOTE_B4,
-    NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_D5,
-    NOTE_C5,    NOTE_B4,    NOTE_A4,      NOTE_A4
-    };
+    NOTE_C5,    NOTE_E5,   NOTE_D5,      NOTE_C5,
+    NOTE_B4, NOTE_C5,    NOTE_D5,     NOTE_E5,
+    NOTE_C5,   NOTE_A4,   NOTE_A4, /**/   REST,
+    NOTE_D5,   NOTE_F5,    NOTE_A5,     NOTE_G5,
+    NOTE_F5,    NOTE_E5, NOTE_C5,      NOTE_E5,
+    NOTE_F5, NOTE_E5, NOTE_D5,      NOTE_C5,
+    NOTE_B4, NOTE_C5,    NOTE_D5,     NOTE_E5,
+    NOTE_C5,   NOTE_A4,   NOTE_A4, /**/   NOTE_E5,
+    NOTE_C5,      NOTE_D5,      NOTE_B4,        NOTE_C5,
+    NOTE_A4,      NOTE_GS4,      NOTE_B4,        NOTE_E5,
+    NOTE_C5,      NOTE_D5,      NOTE_B4,        NOTE_C5,
+    NOTE_E5,   NOTE_A5,   NOTE_A5,     NOTE_GS5/**/};
+
 
 uint16_t melody_idx;
 uint8_t melody_select;
