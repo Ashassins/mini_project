@@ -133,11 +133,11 @@ void TIM16_IRQHandler() {
   nxt_note = melody1[melody_idx];
   nxt_dur = noteDurations1[melody_idx];
 
-  melody_idx += 1;
   if (melody_idx >= melody1_len) {
       melody_idx = 0;
       //melody_select++;
   }
+  melody_idx += 1;
 
   // Select which note, from which melody to play from
   /*
