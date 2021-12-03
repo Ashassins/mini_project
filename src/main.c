@@ -36,6 +36,7 @@ int main(void) {
   // Init i2c and nunchuk
   init_nunchuk();
   for (;;) {
+    print_nunchuk_xy(100,100);
     // Draw the test sprite
     draw_sprite(&invader);
     // Change ("animate") the test sprite

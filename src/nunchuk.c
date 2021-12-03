@@ -409,7 +409,7 @@ void read_nunchuk(uint8_t *buffer) {
     i2c_recvdata(0x52, buffer, 8);
 }
 
-void print_nunchuck_xy(int x, int y) {
+void print_nunchuk_xy(int x, int y) {
     uint8_t buffer[8] = {0};
     memset(buffer, 0, 8);
     read_nunchuk(buffer);

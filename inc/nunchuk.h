@@ -14,6 +14,6 @@ int i2c_recvdata(uint8_t devaddr, void *data, uint8_t size);
 // Nunchuk Functions
 void init_nunchuk(void);
 void read_nunchuk(uint8_t *buffer); // buffer must be length 8
-void print_nunchuck_xy(int x, int y); // x and y location to print
+void print_nunchuk_xy(int x, int y); // x and y location to print
 
 #endif
