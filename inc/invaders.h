@@ -13,7 +13,7 @@ typedef struct {
   // This is the bottom right corner of the
   uint16_t x, y;
   uint16_t width, height;
-  int8_t step;
+  int8_t step, drop;
   uint8_t units[INVADERS_COUNT];
   uint16_t *unit_sprites[INVADERS_SPRITE_COUNT];
   uint32_t unit_sprite_switch_keys[INVADERS_SPRITE_COUNT];

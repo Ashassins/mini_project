@@ -32,11 +32,6 @@ int main(void) {
   // Initialize the invader army
   init_invaders();
   for (;;) {
-    // Draw the test sprite
-    draw_sprite(&invader);
-    // Change ("animate") the test sprite
-    invader.sprite_data =
-        (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
     // Draw the invading army
     draw_invaders();
     // Animate the army

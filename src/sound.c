@@ -129,14 +129,15 @@ void TIM16_IRQHandler() {
   // Status led for lazy debug
   GPIOC->BSRR = GPIO_BSRR_BR_9 | (GPIO_BSRR_BS_9 & ~(GPIOC->ODR));
 
-  melody_idx += 1;
   uint16_t nxt_note, nxt_dur;
+  nxt_note = melody1[melody_idx];
+  nxt_dur = noteDurations1[melody_idx];
+
+  melody_idx += 1;
   if (melody_idx >= melody1_len) {
       melody_idx = 0;
       //melody_select++;
   }
-  nxt_note = melody1[melody_idx];
-  nxt_dur = noteDurations1[melody_idx];
 
   // Select which note, from which melody to play from
   /*
