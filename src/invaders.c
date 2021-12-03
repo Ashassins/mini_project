@@ -1,10 +1,13 @@
 #include "invaders.h"
 #include "lcd.h"
+#include "util.h"
 
 Invaders invaders;
 int _n_unit_type =
     sizeof(invaders.unit_sprites) / sizeof(invaders.unit_sprites[0]);
 
+
+// Initialize the invader state
 void init_invaders() {
   uint8_t type = 1;
   for (int i = 0; i < INVADERS_HEIGHT; i++) {
@@ -28,10 +31,10 @@ void init_invaders() {
   invaders.width = INVADERS_WIDTH * invader1_a_width;
 
   // Init the array of sprite data pointers
-  invaders.unit_sprites[0] = (uint16_t *)invader1_a;
-  invaders.unit_sprites[1] = (uint16_t *)invader2_a;
-  invaders.unit_sprites[2] = (uint16_t *)invader3_a;
-  invaders.unit_sprites[3] = (uint16_t *)invader_explode;
+  invaders.unit_sprites[0] = (uint16_t *) invader1_a;
+  invaders.unit_sprites[1] = (uint16_t *) invader2_a;
+  invaders.unit_sprites[2] = (uint16_t *) invader3_a;
+  invaders.unit_sprites[3] = (uint16_t *) invader_explode;
 
   // Create our switch keys to "animate" the invaders
   invaders.unit_sprite_switch_keys[0] =
@@ -106,4 +109,21 @@ void update_invaders() {
         (uint16_t *)(((uint32_t)invaders.unit_sprites[i]) ^
                      invaders.unit_sprite_switch_keys[i]);
   }
+  Rect hull, old, new;
+  old.x1 = invaders.x;
+  old.y1 = invaders.y;
+  old.x2 = invaders.x + invaders.width;
+  old.y2 = invaders.y + invaders.height;
+  uint16_t new_left = old.x2 + invaders.step;
+  if(new_left > LCD_W || new_left < 0) {
+    invaders.step = -invaders.step;
+    new.y1 = old.y1 - invaders.drop;
+    new.y2 = old.y2 - invaders.drop;
+  } else {
+    new.x1 = old.x1 + invaders.step;
+    new.x2 = old.x2 + invaders.step;
+    new.y1 = old.y1;
+    new.y2 = old.y2;
+  }
+  compute_hull(old, new, &hull);
 }

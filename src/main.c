@@ -36,14 +36,16 @@ int main(void) {
   // Init i2c and nunchuk
   init_nunchuk();
   for (;;) {
+<<<<<<< HEAD
 
-    print_nunchuck_xy(100, 100);
 
     // Draw the test sprite
     draw_sprite(&invader);
     // Change ("animate") the test sprite
     invader.sprite_data =
         (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
+=======
+>>>>>>> 0579348a2c55dabc88cadc6d2e6ba280bc18b593
     // Draw the invading army
     draw_invaders();
     // Animate the army
