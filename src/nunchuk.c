@@ -380,18 +380,18 @@ void nano_wait(unsigned int n) {
             "        bgt repeat\n" : : "r"(n) : "r0", "cc");
 }
 
-void eeprom_blocking_write(uint16_t loc, const char* data, uint8_t len) {
-    TIM7->CR1 &= ~TIM_CR1_CEN; // Pause keypad scanning.
-    eeprom_write(loc, data, len);
-    while (!eeprom_write_complete());
-    TIM7->CR1 |= TIM_CR1_CEN; // Resume keypad scanning.
-}
-
-void clear_display(void) {
-    for (int i=0; i < 8; i++) {
-        msg[i] &= ~0xff;
-    }
-}
+//void eeprom_blocking_write(uint16_t loc, const char* data, uint8_t len) {
+//    TIM7->CR1 &= ~TIM_CR1_CEN; // Pause keypad scanning.
+//    eeprom_write(loc, data, len);
+//    while (!eeprom_write_complete());
+//    TIM7->CR1 |= TIM_CR1_CEN; // Resume keypad scanning.
+//}
+//
+//void clear_display(void) {
+//    for (int i=0; i < 8; i++) {
+//        msg[i] &= ~0xff;
+//    }
+//}
 
 void init_nunchuk(void) {
     uint8_t init_data_1[2] = {0xF0, 0x55};
@@ -401,7 +401,7 @@ void init_nunchuk(void) {
 }
 
 void read_nunchuk(uint8_t *buffer) {
-    uint8_t addr[1] = {0x00}
+    uint8_t addr[1] = {0x00};
     i2c_senddata(0x52, addr, 1);
     nano_wait(200000);
     i2c_recvdata(0x52, buffer, 8);
