@@ -8,8 +8,6 @@ void init_sound_dma();
 
 uint16_t melody_idx;
 uint8_t melody_select;
-const uint16_t melody1_len = sizeof(melody1) / sizeof(melody1[0]);
-const uint16_t melody2_len = sizeof(melody2) / sizeof(melody2[0]);
 
 /*
  * Invokes setup procedures for music module
@@ -139,7 +137,7 @@ void TIM16_IRQHandler() {
   }
   nxt_note = melody1[melody_idx];
   nxt_dur = noteDurations1[melody_idx];
-  
+
   // Select which note, from which melody to play from
   /*
   if (melody_select == 2) {
@@ -208,7 +206,7 @@ const uint16_t melody2[] = {
     NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
     NOTE_F5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
     NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
-    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ NOTE_E5, // 8 
+    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ NOTE_E5, // 8
     NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
     NOTE_A4,    NOTE_GS4,   NOTE_B4, /**/ NOTE_E5, //9
     NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
@@ -240,5 +238,9 @@ const uint16_t noteDurations2[] = {
     QUARTER_NOTE,   QUARTER_NOTE,   HALF_NOTE, /**/   HALF_NOTE,
     HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        HALF_NOTE,
     HALF_NOTE,      HALF_NOTE,      HALF_NOTE, /**/   HALF_NOTE,
-    HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        QUARTER_NOTE, 
+    HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        QUARTER_NOTE,
     QUARTER_NOTE,   QUARTER_NOTE,   QUARTER_NOTE,     WHOLE_NOTE/**/};
+
+const uint16_t melody1_len = sizeof(melody1) / sizeof(melody1[0]);
+const uint16_t melody2_len = sizeof(melody2) / sizeof(melody2[0]);
+
