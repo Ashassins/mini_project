@@ -206,34 +206,34 @@ const uint16_t wavetable[SAMPLES] = {
     1657, 1501, 1345, 1189, 1032, 876,  720,  564,  408,  252,
 };
 
-const uint16_t melody1[] = {
+const uint16_t melody1[] = {// 19
     NOTE_E5,    NOTE_B4,    NOTE_C5,      NOTE_D5,
     NOTE_C5,    NOTE_B4,    NOTE_A4,      NOTE_A4,
     NOTE_C5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
     NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
-    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ REST,
+    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ REST, // 19
     NOTE_D5,    NOTE_F5,    NOTE_A5,      NOTE_G5,
     NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
     NOTE_D5,    NOTE_C5,    NOTE_B4,      NOTE_B4,
     NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_C5,
-    NOTE_A4,    NOTE_A4,/**/NOTE_E5,      NOTE_B4,
+    NOTE_A4,    NOTE_A4,/**/NOTE_E5,      NOTE_B4, // 21
     NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_D5,
     NOTE_C5,    NOTE_B4,    NOTE_A4,      NOTE_A4
 };
 
 const uint16_t melody2[] = {
-    NOTE_C5,    NOTE_E5,   NOTE_D5,      NOTE_C5,
-    NOTE_B4, NOTE_C5,    NOTE_D5,     NOTE_E5,
-    NOTE_C5,   NOTE_A4,   NOTE_A4, /**/   REST,
-    NOTE_D5,   NOTE_F5,    NOTE_A5,     NOTE_G5,
-    NOTE_F5,    NOTE_E5, NOTE_C5,      NOTE_E5,
-    NOTE_F5, NOTE_E5, NOTE_D5,      NOTE_C5,
-    NOTE_B4, NOTE_C5,    NOTE_D5,     NOTE_E5,
-    NOTE_C5,   NOTE_A4,   NOTE_A4, /**/   NOTE_E5,
-    NOTE_C5,      NOTE_D5,      NOTE_B4,        NOTE_C5,
-    NOTE_A4,      NOTE_GS4,      NOTE_B4,        NOTE_E5,
-    NOTE_C5,      NOTE_D5,      NOTE_B4,        NOTE_C5,
-    NOTE_E5,   NOTE_A5,   NOTE_A5,     NOTE_GS5/**/};
+    NOTE_C5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
+    NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
+    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ REST,   // 20
+    NOTE_D5,    NOTE_F5,    NOTE_A5,      NOTE_G5,
+    NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
+    NOTE_F5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
+    NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
+    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ NOTE_E5, // 8 
+    NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
+    NOTE_A4,    NOTE_GS4,   NOTE_B4, /**/ NOTE_E5, //9
+    NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
+    NOTE_E5,    NOTE_A5,    NOTE_A5,      NOTE_GS5/**/};
 
 uint16_t melody_idx;
 uint8_t melody_select;
@@ -241,6 +241,7 @@ uint8_t melody_select;
 const uint16_t melody1_len = sizeof(melody1) / sizeof(melody1[0]);
 const uint16_t melody2_len = sizeof(melody2) / sizeof(melody2[0]);
 
+// 19 19 21 20 8 9
 const uint16_t noteDurations1[] = {
     QUARTER_NOTE,   EIGHTH_NOTE,    EIGHTH_NOTE,      QUARTER_NOTE,
     EIGHTH_NOTE,    EIGHTH_NOTE,    QUARTER_NOTE,     EIGHTH_NOTE,
@@ -265,7 +266,6 @@ const uint16_t noteDurations2[] = {
     DOT_QUART_NOTE, EIGHTH_NOTE,    QUARTER_NOTE,     QUARTER_NOTE,
     QUARTER_NOTE,   QUARTER_NOTE,   HALF_NOTE, /**/   HALF_NOTE,
     HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        HALF_NOTE,
-    HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        HALF_NOTE,
-    HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        HALF_NOTE, 
-    QUARTER_NOTE,   QUARTER_NOTE,   QUARTER_NOTE,   QUARTER_NOTE,     
-    WHOLE_NOTE/**/};
+    HALF_NOTE,      HALF_NOTE,      HALF_NOTE, /**/   HALF_NOTE,
+    HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        QUARTER_NOTE, 
+    QUARTER_NOTE,   QUARTER_NOTE,   QUARTER_NOTE,     WHOLE_NOTE/**/};
