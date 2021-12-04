@@ -24,8 +24,8 @@ int glbcnt = 0;
 // Timer initializer and interrupt
 void init_tim6() {
     RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
-    TIM6->PSC = 1600 - 1;
-    TIM6->ARR = 1000 - 1; // (48000000 / 1600) / 1000 = 30
+    TIM6->PSC = 800 - 1;
+    TIM6->ARR = 1000 - 1; // (48000000 / 800) / 1000 = 60
     TIM6->DIER |= TIM_DIER_UIE;
     TIM6->CR1 |= TIM_CR1_CEN;
     NVIC->ISER[0] |= 1 << TIM6_DAC_IRQn;
@@ -34,7 +34,7 @@ void init_tim6() {
 void TIM6_DAC_IRQHandler(void) {
     TIM6->SR &= ~TIM_SR_UIF;
     glbcnt++;
-    if(glbcnt > 30) glbcnt = 0;
+    if(glbcnt > 59) glbcnt = 0;
 }
 
 
@@ -50,20 +50,30 @@ int main(void) {
   // Initialize the invader army
   init_invaders();
   // Init i2c and nunchuk
-  //init_nunchuk();
+  init_nunchuk();
+  int inc = -5;
+  int chuk = 0;
   for (;;) {
-     //print_nunchuk_xy(100,100);
+	if((glbcnt + 1) % 15 == 0) {
+	  // Draw the invading army
+	  draw_invaders();
+	  // Animate the army
+	  update_invaders();
+	}
+    print_nunchuk_xy(100,100);
     // Draw the test sprite
     draw_sprite(&invader);
     // Change ("animate") the test sprite
     invader.sprite_data =
         (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
-    // Draw the invading army
-    draw_invaders();
-    // Animate the army
-    update_invaders();
+	chuk = nunchuk_xy(100,100);
+	inc = 5 * chuk;
+    if(invader.bbox.x2 > 220) {inc = -5;}
+	if(invader.bbox.x1 < 10) {inc = 5;}
+    move_sprite(&invader, inc, 0);
+
     // Wait until global counter hits correct value
-    while((glbcnt + 1) % 15 != 0);
+    while((glbcnt + 1) % 2 != 0);
     asm volatile("wfi" ::);
   }
 }

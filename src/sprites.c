@@ -37,6 +37,7 @@ void init_sprite(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16
 
 // Gonna need this for the tank and others lmao
 void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y) {
+/*
   // TODO
   Rect old, new, hull;
   old = s->bbox;
@@ -65,5 +66,26 @@ void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y) {
 
     }
   }
+*/
+
+lcddev.select(1);
+LCD_SetWindow(s->bbox.x1, s->bbox.y1, s->bbox.x2, s->bbox.y2);
+LCD_WriteData16_Prepare();
+
+uint16_t width = s->bbox.x2 - s->bbox.x1;
+for (int y = s->bbox.y2 - s->bbox.y1; y >= 0; y--) {
+  for (int x = width; x >= 0; x--) {
+	LCD_WriteData16(0);
+  }
+}
+
+LCD_WriteData16_End();
+lcddev.select(0);
+
+s->bbox.x1 += mov_x;
+s->bbox.x2 += mov_x;
+s->bbox.y1 += mov_y;
+s->bbox.y1 += mov_y;
+draw_sprite(s);
 
 }

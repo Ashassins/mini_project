@@ -426,6 +426,19 @@ void print_nunchuk_xy(int x, int y) {
     LCD_DrawString(x,y,0xFFFF,0x0000, full_out, 16, 0);
 }
 
+int nunchuk_xy(int x, int y) {
+    uint8_t buffer[8] = {0};
+    memset(buffer, 0, 8);
+    read_nunchuk(buffer);
+    int n_x = buffer[0];
+    int n_y = buffer[1];
+    if(n_x > 150)
+    	return -1;
+    else if(n_x < 110)
+    	return 1;
+    else
+    	return 0;
+}
 
 //int main(void)
 //{
