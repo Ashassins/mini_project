@@ -56,8 +56,10 @@ int main(void) {
   // Little test guy
   Sprite invader;
   Sprite player;
+  Sprite shot;
   init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
   init_sprite(120,25,tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
+  init_sprite(1000,1000,tank_shot_width, tank_shot_height, (uint16_t*)tank_shot, (uint16_t*)tank_shot, &shot);
   // Initialize the invader army
   init_invaders();
   // Init i2c and nunchuk
@@ -87,17 +89,17 @@ int main(void) {
     if ((glbcnt + 1) % 2 == 0) {
 		// -----30FPS-----
         if (flg_mv_right && player.bbox.x1 > 0) {
-        	move_sprite(&player, -2, 0);
+        	move_sprite(&player, -2, 0, 0);
         } else if (flg_mv_left && player.bbox.x2 < (LCD_W - 1)) {
-        	move_sprite(&player, 2, 0);
+        	move_sprite(&player, 2, 0, 0);
         } else {
-        	move_sprite(&player, 0, 0);
+        	draw_sprite(&player);
         }
 	}
 
 	// -----60FPS (VERY COSTLY)-----
 
-    move_sprite(&invader, mov_x, mov_y);
+    move_sprite(&invader, mov_x, mov_y, 0);
     if(invader.bbox.x1 <= 0 || invader.bbox.x2 >= (LCD_W - 5)) {
 	  mov_x = -mov_x;
     }

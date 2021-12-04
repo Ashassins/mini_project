@@ -64,3 +64,7 @@ void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y, uint8_t force) {
   lcddev.select(0);
 
 }
+
+int sprite_coll(Sprite *s1, Sprite *s2) {
+    return overlap(s1->bbox, s2->bbox);
+}
