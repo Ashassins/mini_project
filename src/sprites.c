@@ -90,8 +90,8 @@ void clear_sprite(Sprite *s) {
   LCD_WriteData16_Prepare();
   uint16_t h = s->bbox.y2 - s->bbox.y1;
   uint16_t w = s->bbox.x2 - s->bbox.x1;
-  for(uint16_t i = 0; i < h; i++) {
-    for(uint16_t j  = 0; j < w; j++) {
+  for(uint16_t i = 0; i <= h; i++) {
+    for(uint16_t j  = 0; j <= w; j++) {
       LCD_WriteData16(0x0);
     }
   }
