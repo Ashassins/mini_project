@@ -56,7 +56,7 @@ void draw_score(int x, int y) {
 }
 
 int main(void) {
-  init_nunchuk();
+  //init_nunchuk();
   init_tim6();
   setup_music();
   start_music();
@@ -88,7 +88,7 @@ int main(void) {
 //            (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
     	draw_sprite(&bunker);
     	// Draw the invading army
-        draw_invaders();
+       // draw_invaders();
         // Animate the army
         update_invaders();
     }
@@ -120,11 +120,8 @@ int main(void) {
 
         // Collision test
         if (sprite_coll(&shot, &bunker)) {
-            LCD_DrawString(200,200,0xF000,0x0000, "collision", 16, 0);
             teleport_sprite(1000, 1000, &shot);
             score += 1;
-        } else {
-            LCD_DrawString(200,200,0xF000,0x0000, "         ", 16, 0);
         }
 	}
 

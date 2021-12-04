@@ -31,7 +31,8 @@ void init_invaders() {
   }
   invader_army.bbox.x1 = 20;
   invader_army.bbox.y1 = 230;
-
+  invader_army.drop = 5;
+  invader_army.step = 5;
   // The number of pixels we need to draw the invaders, accounting for the 2 px
   // between rows
   invader_army.bbox.x2 =
@@ -108,67 +109,67 @@ void update_invaders() {
         (uint16_t *)(((uint32_t)invader_army.units[i].sprite_data) ^
                      invader_army.units[i].sprite_swap_key);
   }
-  // Rect hull, old, new;
-  // old = invader_army.bbox;
-  // new = invader_army.bbox;
-  // uint16_t new_left = old.x2 + invader_army.step;
-  // if(new_left > LCD_W || new_left < 0) {
-  //  invader_army.step = -invader_army.step;
-  //  new.y1 = old.y1 - invader_army.drop;
-  //  new.y2 = old.y2 - invader_army.drop;
-  //} else {
-  //  new.x1 = old.x1 + invader_army.step;
-  //  new.x2 = old.x2 + invader_army.step;
-  //  new.y1 = old.y1;
-  //  new.y2 = old.y2;
-  //}
-  // compute_hull(old, new, &hull);
+  Rect hull, old, new;
+  old = invader_army.bbox;
+  new = invader_army.bbox;
+  uint16_t new_left = old.x2 + invader_army.step;
+  if(new_left > LCD_W || old.x1 + invader_army.step < 0) {
+    invader_army.step = -invader_army.step;
+    new.y1 = old.y1 - invader_army.drop;
+    new.y2 = old.y2 - invader_army.drop;
+  } else {
+    new.x1 = old.x1 + invader_army.step;
+    new.x2 = old.x2 + invader_army.step;
+    new.y1 = old.y1;
+    new.y2 = old.y2;
+  }  compute_hull(old, new, &hull);
+  invader_army.bbox = new;
 
-  // invader_army.x = new.x1;
-  // invader_army.y = new.y1;
-  //// Start the draw call
-  // lcddev.select(1);
-  // LCD_SetWindow(invader_army.x, invader_army.y, invader_army.x +
-  // invader_army.width - 1,
-  //              invader_army.y + invader_army.height - 1);
-  // LCD_WriteData16_Prepare();
+  // Start the draw call
+  lcddev.select(1);
+  LCD_SetWindow(hull.x1, hull.y1, hull.x2, hull.y2);
+  LCD_WriteData16_Prepare();
+
+  // Draw the army
+  uint16_t sprite_x = 0, sprite_y = 0;
+  uint16_t army_idx = 0;
 
   //// Draw the army
-  // for (int army_y = INVADERS_HEIGHT - 1; army_y >= 0; army_y--) {
-  //  for (int sprite_y = invader1_a_height - 1; sprite_y >= 0; sprite_y--) {
-  //    for (int army_x = INVADERS_WIDTH - 1; army_x >= 0; army_x--) {
-  //      uint8_t invader_type = invader_army.units[army_x + army_y *
-  //      INVADERS_WIDTH]; for (int sprite_x = invader1_a_width - 1; sprite_x >=
-  //      0; sprite_x--) {
-  //        // Select which sprite to draw from
-  //        switch (invader_type) {
-  //        case 1:
-  //          LCD_WriteData16(
-  //              invader_army
-  //                  .unit_sprites[0][sprite_x + sprite_y * invader1_a_width]);
-  //          break;
-  //        case 2:
-  //          LCD_WriteData16(
-  //              invader_army
-  //                  .unit_sprites[1][sprite_x + sprite_y * invader1_a_width]);
-  //          break;
-  //        case 3:
-  //          LCD_WriteData16(
-  //              invader_army
-  //                  .unit_sprites[2][sprite_x + sprite_y * invader1_a_width]);
-  //          break;
-  //        default:
-  //          LCD_WriteData16(0);
-  //        }
-  //      }
-  //    }
-  //  }
-  //  // Row spacing, just a bunch of black pixels
-  //  for (int x = (invader1_a_width * INVADERS_WIDTH * 2) - 1; x >= 0; x--) {
-  //    LCD_WriteData16(0);
-  //  }
-  //}
+  for (uint16_t glob_y = hull.y1; glob_y <= hull.y2; glob_y++) {
+    // Do we need to draw between the rows
+    if (sprite_y >= invader1_a_height) {
+      // Draw some spacing between the rows
+      glob_y += 2;
+      for (int i = 0; i < (hull.x2 - hull.x1 + 1) * 2; i++) {
+        LCD_WriteData16(0x0);
+      }
+      // Reset the sprite veritcal
+      sprite_y = 0;
+      army_idx += INVADERS_WIDTH;
+    }
+    // Go through a row
+    for (uint16_t glob_x = hull.x1; glob_x <= hull.x2; glob_x++) {
+      if (contains(glob_x, glob_y, new)) {
+        uint16_t *cur_data = invader_army.units[0].sprite_data;
+        if (cur_data) {
+          LCD_WriteData16(cur_data[sprite_x + sprite_y * invader1_a_width]);
+        } else {
+          LCD_WriteData16(0x0);
+        }
+        sprite_x++;
+        if (sprite_x >= invader1_a_width) {
+          sprite_x = 0;
+          army_idx += 1;
+        }
+      } else {
+        LCD_WriteData16(0x0);
+      }
+    }
+    army_idx -= INVADERS_WIDTH;
+    sprite_y++;
+    sprite_x = 0;
+  }
   //// Close down the communication with the lcd
-  // LCD_WriteData16_End();
-  // lcddev.select(0);
+  LCD_WriteData16_End();
+  lcddev.select(0);
 }
