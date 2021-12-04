@@ -88,7 +88,7 @@ void init_tim16() {
   TIM16->CR2 |= TIM_CR2_MMS_1;
 
   TIM16->PSC = 48000 - 1;
-  TIM16->ARR = noteDurations1[melody_idx]; //- 1;
+  TIM16->ARR = noteDurations1[melody_idx] - 1; //- 1;
   TIM16->CR1 |= TIM_CR1_ARPE;
   TIM16->DIER |= TIM_DIER_UIE;
   NVIC->ISER[0] |= 1 << TIM16_IRQn;
