@@ -53,15 +53,14 @@ void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y) {
   LCD_WriteData16_Prepare();
 
   s->bbox = new;
-  uint16_t width = s->bbox.x2 - s->bbox.x1 + 1;
-  for(uint16_t y = hull.y2; y >= hull.y1; y--) {
-    for(uint16_t x = hull.x2; x >= hull.x1; x--) {
-      if(contains(x, y, old)) {
-        uint16_t draw_x = x - hull.x1;
-        uint16_t draw_y = y - hull.y1;
-        LCD_WriteData16(s->sprite_data[draw_x + draw_y * width]);
+  uint16_t paint_idx = 0;
+  for(uint16_t y = hull.y1; y <= hull.y2; y++) {
+    for(uint16_t x = hull.x1; x <= hull.x2; x++) {
+      if(contains(x, y, new)) {
+        LCD_WriteData16(s->sprite_data[paint_idx]);
+        paint_idx++;
       } else {
-        LCD_WriteData16(0x0);
+        LCD_WriteData16(GREEN);
       }
       //int16_t draw_y = y2 - y;
       //int16_t draw_x = x2 - x;
