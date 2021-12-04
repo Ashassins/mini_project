@@ -66,5 +66,20 @@ void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y, uint8_t force) {
 }
 
 int sprite_coll(Sprite *s1, Sprite *s2) {
+    if ((s1->bbox.x1 < 0 || s1->bbox.y1 < 0 || s1->bbox.x2 > LCD_W || s1->bbox.y2 > LCD_H) || (s2->bbox.x1 < 0 || s2->bbox.y1 < 0 || s2->bbox.x2 > LCD_W || s2->bbox.y2 > LCD_H)) {
+        return 0;
+    }
     return overlap(s1->bbox, s2->bbox);
+}
+
+void teleport_sprite(uint16_t x, uint16_t y, Sprite *s) {
+    // x2 = x + width - 1;
+    // x2 - x = width - 1;
+    // x2 - x + 1 = width;
+    int width = s->bbox.x2 - s->bbox.x1 + 1;
+    int height = s->bbox.y2 - s->bbox.y1 + 1;
+    s->bbox.x1 = x;
+    s->bbox.y1 = y;
+    s->bbox.x2 = x + width - 1;
+    s->bbox.y2 = y + height - 1;
 }

@@ -8,6 +8,7 @@
 #include "string.h"
 #include "stm32f0xx.h"
 
+#define SHOT_SPEED 5
 // TODO This should be replaced with global tick, maybe use SysTick and check it
 // rather than busy looping
 static inline void nano_wait(unsigned int n) {
@@ -57,9 +58,11 @@ int main(void) {
   Sprite invader;
   Sprite player;
   Sprite shot;
+  Sprite bunker;
   init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
   init_sprite(120,25,tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
   init_sprite(1000,1000,tank_shot_width, tank_shot_height, (uint16_t*)tank_shot, (uint16_t*)tank_shot, &shot);
+  init_sprite(100,100,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker);
   // Initialize the invader army
   init_invaders();
   // Init i2c and nunchuk
@@ -74,7 +77,8 @@ int main(void) {
             (uint16_t *)(((uint32_t)player.sprite_data) ^ player.sprite_swap_key);
     	invader.sprite_data =
             (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
-        // Draw the invading army
+    	draw_sprite(&bunker);
+    	// Draw the invading army
         draw_invaders();
         // Animate the army
         update_invaders();
@@ -94,6 +98,22 @@ int main(void) {
         	move_sprite(&player, 2, 0, 0);
         } else {
         	draw_sprite(&player);
+        }
+        if (flg_v && (shot.bbox.x1 == 1000)) {
+            teleport_sprite((int)((player.bbox.x2 + player.bbox.x1) / 2), player.bbox.y1 + 10, &shot);
+            draw_sprite(&shot);
+        }
+        if (shot.bbox.y2 >= (LCD_H + SHOT_SPEED)) {
+            teleport_sprite(1000, 1000, &shot);
+        } else if (shot.bbox.x1 != 1000) {
+            move_sprite(&shot, 0, SHOT_SPEED, 0);
+        }
+
+        // Collision test
+        if (sprite_coll(&shot, &bunker)) {
+            LCD_DrawString(200,200,0xF000,0x0000, "collision", 16, 0);
+        } else {
+            LCD_DrawString(200,200,0xF000,0x0000, "         ", 16, 0);
         }
 	}
 

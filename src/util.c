@@ -9,12 +9,11 @@ void compute_hull(Rect a, Rect b, Rect *rv) {
 }
 
 uint8_t overlap(Rect a, Rect b) {
-  // Kinda ripped from here
-  // https://stackoverflow.com/questions/9324339/how-much-do-two-rectangles-overlap/9325084
-  int32_t dx = a.x1 - b.x2;
-  int32_t dy = a.y1 - b.y2;
-  // Check if the sign is the same
-  return ~((dx ^ dy) >> 31) & 1;
+    if (a.x2 > b.x1 && a.x1 < b.x2 && a.y2 > b.y1 && a.y1 < b.y2) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 
