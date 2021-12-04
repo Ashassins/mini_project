@@ -173,9 +173,9 @@ void TIM16_IRQHandler() {
 
   // Set the pitch and duration values in the relavant timers
   TIM2->ARR = nxt_note;
-  printf("next_note : %f ", nxt_note);
+  //printf("next_note : %f ", nxt_note);
   TIM16->ARR = nxt_dur - 1;
-  printf("next_dur : %f\n", nxt_dur);
+  //printf("next_dur : %f\n", nxt_dur);
 }
 
 const uint16_t wavetable[SAMPLES] = {
