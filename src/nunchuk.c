@@ -462,11 +462,11 @@ void update_flags(void) {
 }
 
 void print_flags(int x, int y) {
-    char output[13] = "r: l: c: v: ";
+    char output[17] = "R:  L:  C:  V:  ";
     output[2] = '0' + flg_mv_right;
-    output[5] = '0' + flg_mv_left;
-    output[8] = '0' + flg_c;
-    output[11] = '0' + flg_v;
+    output[6] = '0' + flg_mv_left;
+    output[10] = '0' + flg_c;
+    output[14] = '0' + flg_v;
     LCD_DrawString(x,y,0xFFFF,0x0000, output, 16, 0);
 }
 

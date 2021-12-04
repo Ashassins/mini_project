@@ -1019,17 +1019,17 @@ void _LCD_DrawChar(u16 x, u16 y, u16 fc, u16 bc, char num, u8 size, u8 mode) {
   LCD_SetWindow(x, y, x + size / 2 - 1, y + size - 1);
   if (!mode) {
     LCD_WriteData16_Prepare();
-    for (pos = 0; pos < size; pos++) {
+    for (pos = size; pos > 0; pos--) {
       if (size == 12)
         temp = asc2_1206[num][pos];
       else
         temp = asc2_1608[num][pos];
       for (t = 0; t < size / 2; t++) {
-        if (temp & 0x01)
+        if (temp & 0x80)
           LCD_WriteData16(fc);
         else
           LCD_WriteData16(bc);
-        temp >>= 1;
+        temp <<= 1;
       }
     }
     LCD_WriteData16_End();
@@ -1064,10 +1064,10 @@ void LCD_DrawChar(u16 x, u16 y, u16 fc, u16 bc, char num, u8 size, u8 mode) {
 void LCD_DrawString(u16 x, u16 y, u16 fc, u16 bg, const char *p, u8 size, u8 mode) {
   lcddev.select(1);
   while ((*p <= '~') && (*p >= ' ')) {
-    if (x > (lcddev.width - 1) || y > (lcddev.height - 1))
+    if (x < 1 || y > (lcddev.height - 1))
       return;
     _LCD_DrawChar(x, y, fc, bg, *p, size, mode);
-    x += size / 2;
+    x -= size / 2;
     p++;
   }
   lcddev.select(0);
