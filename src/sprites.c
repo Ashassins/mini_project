@@ -3,7 +3,7 @@
 #include "util.h"
 
 void draw_sprite(Sprite *s) {
-  move_sprite(s, 0, 0);
+  move_sprite(s, 0, 0, 1);
 }
 
 
@@ -21,12 +21,12 @@ void init_sprite(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16
 }
 
 // Gonna need this for the tank and others lmao
-void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y) {
+void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y, uint8_t force) {
   Rect old, new, hull;
   old = s->bbox;
   new = s->bbox;
 
-  if(mov_x != 0 || mov_y != 0) {
+  if((mov_x != 0 || mov_y != 0) && !force) {
     new.x1 += mov_x;
     new.x2 += mov_x;
     new.y1 += mov_y;
