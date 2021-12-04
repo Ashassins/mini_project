@@ -3,22 +3,7 @@
 #include "util.h"
 
 void draw_sprite(Sprite *s) {
-  lcddev.select(1);
-  LCD_SetWindow(s->bbox.x1, s->bbox.y1, s->bbox.x2, s->bbox.y2);
-  LCD_WriteData16_Prepare();
-
-  uint16_t width = s->bbox.x2 - s->bbox.x1;
-  uint16_t height = s->bbox.y2 - s->bbox.y1;
-  uint16_t px_access = 0;
-  for (int y = 0; y <= height; y--) {
-    for (int x = 0; x <= width; x--) {
-      px_access++;
-      LCD_WriteData16(s->sprite_data[px_access]);
-    }
-  }
-
-  LCD_WriteData16_End();
-  lcddev.select(0);
+  move_sprite(s, 0, 0, 1);
 }
 
 
@@ -36,24 +21,31 @@ void init_sprite(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16
 }
 
 // Gonna need this for the tank and others lmao
-void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y) {
+void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y, uint8_t force) {
   Rect old, new, hull;
   old = s->bbox;
   new = s->bbox;
-  new.x1 += mov_x;
-  new.x2 += mov_x;
-  new.y1 += mov_y;
-  new.y2 += mov_y;
 
-  compute_hull(old, new, &hull);
+  if(mov_x != 0 || mov_y != 0  || force) {
+    new.x1 += mov_x;
+    new.x2 += mov_x;
+    new.y1 += mov_y;
+    new.y2 += mov_y;
+    compute_hull(old, new, &hull);
+  }
+  // Set the new bounding box
+  s->bbox = new;
+
+  if(hull.x1 < 0 || hull.y1 < 0 || hull.x2 > LCD_W || hull.y2 > LCD_H) {
+    return;
+  }
 
   // Magic screen incatation
   lcddev.select(1);
   LCD_SetWindow(hull.x1, hull.y1, hull.x2, hull.y2);
   LCD_WriteData16_Prepare();
 
-  // Set the new bounding box
-  s->bbox = new;
+
   // Start drawing the sprite
   uint16_t paint_idx = 0;
   for(uint16_t y = hull.y1; y <= hull.y2; y++) {
@@ -71,4 +63,8 @@ void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y) {
   LCD_WriteData16_End();
   lcddev.select(0);
 
+}
+
+int sprite_coll(Sprite *s1, Sprite *s2) {
+    return overlap(s1->bbox, s2->bbox);
 }

@@ -27,6 +27,10 @@ void draw_sprite(Sprite *s);
  */
 void init_sprite(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t *sprite_a, uint16_t *sprite_b, Sprite *s);
 
-void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y);
+void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y, uint8_t force);
+
+int sprite_coll(Sprite *s1, Sprite *s2);
+
+Sprite* invader_coll(Sprite *s);
 
 #endif
