@@ -18,9 +18,10 @@ static inline void nano_wait(unsigned int n) {
       : "r0", "cc");
 }
 
-// Timer
+// Global counter, modified in timer interrupt
 int glbcnt = 0;
 
+// Timer initializer and interrupt
 void init_tim6() {
     RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
     TIM6->PSC = 1600 - 1;
@@ -61,8 +62,7 @@ int main(void) {
     draw_invaders();
     // Animate the army
     update_invaders();
-    // Wait like a dum-dum because we dont have a global tick setup yet
-    //nano_wait(500000000);
+    // Wait until global counter hits correct value
     while((glbcnt + 1) % 15 != 0);
     asm volatile("wfi" ::);
   }
