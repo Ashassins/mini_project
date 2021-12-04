@@ -133,7 +133,7 @@ void TIM16_IRQHandler() {
   nxt_note = melody1[melody_idx];
   nxt_dur = noteDurations1[melody_idx];
 
-  if (melody_idx > melody1_len) {
+  if (melody_idx >= melody1_len) {
       melody_idx = 0;
       //melody_select++;
   }
