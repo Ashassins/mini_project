@@ -450,14 +450,14 @@ void update_flags(void) {
         flg_mv_right = 0;
     }
     if (buffer[5] & 0x02) {
-        flg_c = 1;
-    } else {
         flg_c = 0;
+    } else {
+        flg_c = 1;
     }
     if (buffer[5] & 0x01) {
-        flg_v = 1;
-    } else {
         flg_v = 0;
+    } else {
+        flg_v = 1;
     }
 }
 
