@@ -32,7 +32,7 @@ void init_invaders() {
   invader_army.bbox.x1 = 20;
   invader_army.bbox.y1 = 230;
   invader_army.drop = 5;
-  invader_army.step = 5;
+  invader_army.step = 2;
   // The number of pixels we need to draw the invaders, accounting for the 2 px
   // between rows
   invader_army.bbox.x2 =
@@ -113,7 +113,7 @@ void update_invaders() {
   old = invader_army.bbox;
   new = invader_army.bbox;
   uint16_t new_left = old.x2 + invader_army.step;
-  if(new_left > LCD_W || old.x1 + invader_army.step < 0) {
+  if(new_left >= LCD_W || old.x1 + invader_army.step < 0) {
     invader_army.step = -invader_army.step;
     new.y1 = old.y1 - invader_army.drop;
     new.y2 = old.y2 - invader_army.drop;
