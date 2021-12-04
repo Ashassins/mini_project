@@ -88,7 +88,7 @@ void init_tim16() {
   TIM16->CR2 |= TIM_CR2_MMS_1;
 
   TIM16->PSC = 48000 - 1;
-  TIM16->ARR = noteDurations1[melody_idx] - 1; //- 1;
+  TIM16->ARR = (noteDurations1[melody_idx]) - 1; //- 1;
   TIM16->CR1 |= TIM_CR1_ARPE;
   TIM16->DIER |= TIM_DIER_UIE;
   NVIC->ISER[0] |= 1 << TIM16_IRQn;
@@ -132,12 +132,11 @@ void TIM16_IRQHandler() {
   uint16_t nxt_note, nxt_dur;
   nxt_note = melody1[melody_idx];
   nxt_dur = noteDurations1[melody_idx];
-
-  if (melody_idx >= melody1_len) {
+  melody_idx += 1;
+  if (melody_idx > melody1_len) {
       melody_idx = 0;
       //melody_select++;
   }
-  melody_idx += 1;
 
   // Select which note, from which melody to play from
   /*
