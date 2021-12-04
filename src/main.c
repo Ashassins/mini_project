@@ -39,6 +39,12 @@ static inline void nano_wait(unsigned int n) {
 //    update_flags();
 //}
 
+void print_glbcnt(int x, int y) {
+    char output[5] = "G:  ";
+    itoa(glbcnt, &output[2], 10);
+    LCD_DrawString(x,y,0xFFFF,0x0000, output, 16, 0);
+}
+
 int main(void) {
   init_nunchuk();
   init_tim6();
@@ -58,6 +64,7 @@ int main(void) {
      //print_nunchuk_xy(100,100);
     // Draw the test sprite
     print_flags(175,1);
+    print_glbcnt(230,1);
 //    move_sprite(&invader, mov_x, mov_y);
 //    if(invader.bbox.x1 <= 0 || invader.bbox.x2 >= LCD_W) {
 //      mov_x = -mov_x;
@@ -65,20 +72,25 @@ int main(void) {
 //    if(invader.bbox.y1 <= 0 || invader.bbox.y2 >= LCD_H){
 //      mov_y = - mov_y;
 //    }
-    // Change ("animate") the test sprite
-    invader.sprite_data =
-        (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
-    if (flg_mv_right) {
-    	move_sprite(&invader, -5, 0);
-    } else if (flg_mv_left) {
-    	move_sprite(&invader, 5, 0);
+
+    if ((glbcnt + 1) % 15 == 0) {
+    	// Change ("animate") the test sprite
+        invader.sprite_data =
+            (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
+        // Draw the invading army
+        draw_invaders();
+        // Animate the army
+        update_invaders();
+        // Wait until global counter hits correct value
     }
-    // Draw the invading army
-    draw_invaders();
-    // Animate the army
-    update_invaders();
-    // Wait until global counter hits correct value
-    while((glbcnt + 1) % 15 != 0);
+
+    if (flg_mv_right) {
+    	move_sprite(&invader, -1, 0);
+    } else if (flg_mv_left) {
+    	move_sprite(&invader, 1, 0);
+    }
+
+    while((glbcnt + 1) % 1 != 0);
     asm volatile("wfi" ::);
   }
 }
