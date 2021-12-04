@@ -15,8 +15,8 @@ def load_img(path: str) -> Tuple[List[int], Tuple[int, int]]:
     im = Image.open(path)
     px = im.load()
     img = []
-    for i in range(im.size[1]):
-        for j in range(im.size[0]):
+    for i in reversed(range(im.size[1])):
+        for j in reversed(range(im.size[0])):
             img.append(px2u16(px[j, i]))
     return img, im.size
 
