@@ -53,9 +53,10 @@ int main(void) {
   LCD_Setup();
   LCD_Clear(0x0);
   // Little test guy
+  Sprite invader;
   Sprite player;
-//  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
-  init_sprite(40,40,tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
+  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
+  init_sprite(120,25,tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
   // Initialize the invader army
   init_invaders();
   // Init i2c and nunchuk
@@ -66,18 +67,22 @@ int main(void) {
     // Draw the test sprite
     print_flags(175,1);
     print_glbcnt(230,1);
-//    move_sprite(&invader, mov_x, mov_y);
-//    if(invader.bbox.x1 <= 0 || invader.bbox.x2 >= LCD_W) {
-//      mov_x = -mov_x;
-//    }
-//    if(invader.bbox.y1 <= 0 || invader.bbox.y2 >= LCD_H){
-//      mov_y = - mov_y;
-//    }
+    move_sprite(&invader, mov_x, mov_y);
+    if(invader.bbox.x1 <= 0 || invader.bbox.x2 >= LCD_W) {
+      mov_x = -mov_x;
+    }
+    if(invader.bbox.y1 <= 0 || invader.bbox.y2 >= LCD_H){
+      mov_y = - mov_y;
+    }
+	invader.sprite_data =
+        (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
 
     if ((glbcnt + 1) % 15 == 0) {
+    	LCD_DrawString(230,300,0xFFFF,0x0000, "Don't mind the spaz monke uwu", 16, 0);
     	// Change ("animate") the test sprite
     	player.sprite_data =
             (uint16_t *)(((uint32_t)player.sprite_data) ^ player.sprite_swap_key);
+    	move_sprite(&player, 0, 0);
         // Draw the invading army
         draw_invaders();
         // Animate the army
@@ -85,9 +90,9 @@ int main(void) {
         // Wait until global counter hits correct value
     }
 
-    if (flg_mv_right) {
+    if (flg_mv_right && player.bbox.x1 > 0) {
     	move_sprite(&player, -1, 0);
-    } else if (flg_mv_left) {
+    } else if (flg_mv_left && player.bbox.x2 < (LCD_W - 1)) {
     	move_sprite(&player, 1, 0);
     }
 
