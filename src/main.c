@@ -112,6 +112,7 @@ int main(void) {
         // Collision test
         if (sprite_coll(&shot, &bunker)) {
             LCD_DrawString(200,200,0xF000,0x0000, "collision", 16, 0);
+            teleport_sprite(1000, 1000, &shot);
         } else {
             LCD_DrawString(200,200,0xF000,0x0000, "         ", 16, 0);
         }

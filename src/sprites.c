@@ -76,12 +76,14 @@ void teleport_sprite(uint16_t x, uint16_t y, Sprite *s) {
     // x2 = x + width - 1;
     // x2 - x = width - 1;
     // x2 - x + 1 = width;
+    clear_sprite(s);
     int width = s->bbox.x2 - s->bbox.x1 + 1;
     int height = s->bbox.y2 - s->bbox.y1 + 1;
     s->bbox.x1 = x;
     s->bbox.y1 = y;
     s->bbox.x2 = x + width - 1;
     s->bbox.y2 = y + height - 1;
+    draw_sprite(s);
 }
 
 void clear_sprite(Sprite *s) {
