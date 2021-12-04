@@ -1,4 +1,5 @@
 #include "stm32f0xx.h"
+#include "nunchuk.h"
 
 // Global counter, modified in timer interrupt
 int glbcnt = 0;
@@ -17,4 +18,5 @@ void TIM6_DAC_IRQHandler(void) {
     TIM6->SR &= ~TIM_SR_UIF;
     glbcnt++;
     if(glbcnt > 59) glbcnt = 0;
+    update_flags();
 }
