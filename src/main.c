@@ -40,8 +40,8 @@ static inline void nano_wait(unsigned int n) {
 //}
 
 int main(void) {
-  //init_nunchuk();
-  //init_tim6();
+  init_nunchuk();
+  init_tim6();
   setup_music();
   start_music();
   LCD_Setup();
@@ -57,7 +57,7 @@ int main(void) {
   for (;;) {
      //print_nunchuk_xy(100,100);
     // Draw the test sprite
-    //print_flags(100,100);
+    print_flags(175,1);
     move_sprite(&invader, mov_x, mov_y);
     if(invader.bbox.x1 <= 0 || invader.bbox.x2 >= LCD_W) {
       mov_x = -mov_x;
@@ -78,7 +78,7 @@ int main(void) {
     // Animate the army
     //update_invaders();
     // Wait until global counter hits correct value
-    //while((glbcnt + 1) % 15 != 0);
+    while((glbcnt + 1) % 15 != 0);
     asm volatile("wfi" ::);
   }
 }
