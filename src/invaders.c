@@ -1,50 +1,44 @@
 #include "invaders.h"
 #include "lcd.h"
+#include "sprites.h"
 #include "util.h"
 
 InvaderArmy invader_army;
-int _n_unit_type =
-    sizeof(invader_army.unit_sprites) / sizeof(invader_army.unit_sprites[0]);
-
+int _n_units = sizeof(invader_army.units) / sizeof(invader_army.units[0]);
 
 // Initialize the invader state
 void init_invaders() {
-  uint8_t type = 1;
-  for (int i = 0; i < INVADERS_HEIGHT; i++) {
-    for (int j = 0; j < INVADERS_WIDTH; j++) {
-      if (i < 0) {
-        type = 1;
-      } else if (i <= 3) {
-        type = 2;
+  uint16_t *sprite_a;
+  uint16_t *sprite_b;
+  for (int y = 0; y < INVADERS_HEIGHT; y++) {
+    for (int x = 0; x < INVADERS_WIDTH; x++) {
+      if (y <= 1) {
+        sprite_a = (uint16_t *)invader1_a;
+        sprite_b = (uint16_t *)invader1_b;
+      } else if (y <= 3) {
+        sprite_a = (uint16_t *)invader2_a;
+        sprite_b = (uint16_t *)invader2_b;
       } else {
-        type = 3;
+        sprite_a = (uint16_t *)invader3_a;
+        sprite_b = (uint16_t *)invader3_b;
       }
-      invader_army.units[j + i * INVADERS_WIDTH] = type;
+      init_sprite(
+          x * invader1_a_width,
+          y * (invader1_a_height + 2), // Add two to acount for the spacing
+          invader1_a_width, invader1_a_height, sprite_a, sprite_b,
+          &invader_army.units[x + y * INVADERS_WIDTH]);
     }
   }
-  invader_army.x = 0;
-  invader_army.y = 230;
+  invader_army.bbox.x1 = 20;
+  invader_army.bbox.y1 = 230;
 
   // The number of pixels we need to draw the invaders, accounting for the 2 px
   // between rows
-  invader_army.height = INVADERS_HEIGHT * invader1_a_height + (INVADERS_HEIGHT * 2);
-  invader_army.width = INVADERS_WIDTH * invader1_a_width;
-
-  // Init the array of sprite data pointers
-  invader_army.unit_sprites[0] = (uint16_t *) invader1_a;
-  invader_army.unit_sprites[1] = (uint16_t *) invader2_a;
-  invader_army.unit_sprites[2] = (uint16_t *) invader3_a;
-  invader_army.unit_sprites[3] = (uint16_t *) invader_explode;
-
-  // Create our switch keys to "animate" the invaders
-  invader_army.unit_sprite_switch_keys[0] =
-      ((uint32_t)invader1_a) ^ ((uint32_t)invader1_b);
-  invader_army.unit_sprite_switch_keys[1] =
-      ((uint32_t)invader2_a) ^ ((uint32_t)invader2_b);
-  invader_army.unit_sprite_switch_keys[2] =
-      ((uint32_t)invader3_a) ^ ((uint32_t)invader3_b);
-  // This one is zero because we only have one frame for the explosion
-  invader_army.unit_sprite_switch_keys[3] = 0;
+  invader_army.bbox.x2 =
+      invader_army.bbox.x1 + INVADERS_WIDTH * invader1_a_width;
+  invader_army.bbox.y2 = invader_army.bbox.y1 +
+                         INVADERS_HEIGHT * invader1_a_height +
+                         (INVADERS_HEIGHT * 2) - 1;
 }
 
 /*
@@ -56,43 +50,48 @@ void init_invaders() {
 void draw_invaders() {
   // Start the draw call
   lcddev.select(1);
-  LCD_SetWindow(invader_army.x, invader_army.y, invader_army.x + invader_army.width - 1,
-                invader_army.y + invader_army.height - 1);
+  LCD_SetWindow(invader_army.bbox.x1, invader_army.bbox.y1,
+                invader_army.bbox.x2, invader_army.bbox.y2);
   LCD_WriteData16_Prepare();
 
   // Draw the army
-  for (int army_y = 0; army_y < INVADERS_HEIGHT; army_y++) {
-    for (int sprite_y = 0; sprite_y < invader1_a_height; sprite_y++) {
-      for (int army_x = 0; army_x < INVADERS_WIDTH; army_x++) {
-        uint8_t invader_type = invader_army.units[army_x + army_y * INVADERS_WIDTH];
-        for (int sprite_x = 0; sprite_x < invader1_a_width; sprite_x++) {
-          // Select which sprite to draw from
-          switch (invader_type) {
-          case 1:
-            LCD_WriteData16(
-                invader_army
-                    .unit_sprites[0][sprite_x + sprite_y * invader1_a_width]);
-            break;
-          case 2:
-            LCD_WriteData16(
-                invader_army
-                    .unit_sprites[1][sprite_x + sprite_y * invader1_a_width]);
-            break;
-          case 3:
-            LCD_WriteData16(
-                invader_army
-                    .unit_sprites[2][sprite_x + sprite_y * invader1_a_width]);
-            break;
-          default:
-            LCD_WriteData16(0);
-          }
-        }
+  uint16_t sprite_x = 0, sprite_y = 0;
+  uint16_t army_idx = 0;
+  // Loop bounds
+  uint16_t start_y = invader_army.bbox.y1;
+  uint16_t end_y = invader_army.bbox.y2;
+  uint16_t start_x = invader_army.bbox.x1;
+  uint16_t end_x = invader_army.bbox.x2;
+
+  for (uint16_t glob_y = start_y; glob_y <= end_y; glob_y++) {
+    // Do we need to draw between the rows
+    if (sprite_y >= invader1_a_height) {
+      // Draw some spacing between the rows
+      glob_y += 2;
+      for (int i = 0; i < (end_x - start_x + 1) * 2; i++) {
+        LCD_WriteData16(0x0);
+      }
+      // Reset the sprite veritcal
+      sprite_y = 0;
+      army_idx += INVADERS_WIDTH;
+    }
+    // Go through a row
+    for (uint16_t glob_x = start_x; glob_x <= end_x; glob_x++) {
+      uint16_t *cur_data = invader_army.units[0].sprite_data;
+      if (cur_data) {
+        LCD_WriteData16(cur_data[sprite_x + sprite_y * invader1_a_width]);
+      } else {
+        LCD_WriteData16(0x0);
+      }
+      sprite_x++;
+      if (sprite_x >= invader1_a_width) {
+        sprite_x = 0;
+        army_idx += 1;
       }
     }
-    // Row spacing, just a bunch of black pixels
-    for (int x = (invader1_a_width * INVADERS_WIDTH * 2) - 1; x >= 0; x--) {
-      LCD_WriteData16(0);
-    }
+    army_idx -= INVADERS_WIDTH;
+    sprite_y++;
+    sprite_x = 0;
   }
   // Close down the communication with the lcd
   LCD_WriteData16_End();
@@ -103,19 +102,17 @@ void draw_invaders() {
 // step negative
 // TODO Clear the region where the invaders were but no longer are
 void update_invaders() {
-  for (int i = 0; i < _n_unit_type; i++) {
+  for (int i = 0; i < _n_units; i++) {
     // Swap each sprite pointer
-    invader_army.unit_sprites[i] =
-        (uint16_t *)(((uint32_t)invader_army.unit_sprites[i]) ^
-                     invader_army.unit_sprite_switch_keys[i]);
+    invader_army.units[i].sprite_data =
+        (uint16_t *)(((uint32_t)invader_army.units[i].sprite_data) ^
+                     invader_army.units[i].sprite_swap_key);
   }
-  //Rect hull, old, new;
-  //old.x1 = invader_army.x;
-  //old.y1 = invader_army.y;
-  //old.x2 = invader_army.x + invader_army.width;
-  //old.y2 = invader_army.y + invader_army.height;
-  //uint16_t new_left = old.x2 + invader_army.step;
-  //if(new_left > LCD_W || new_left < 0) {
+  // Rect hull, old, new;
+  // old = invader_army.bbox;
+  // new = invader_army.bbox;
+  // uint16_t new_left = old.x2 + invader_army.step;
+  // if(new_left > LCD_W || new_left < 0) {
   //  invader_army.step = -invader_army.step;
   //  new.y1 = old.y1 - invader_army.drop;
   //  new.y2 = old.y2 - invader_army.drop;
@@ -125,22 +122,24 @@ void update_invaders() {
   //  new.y1 = old.y1;
   //  new.y2 = old.y2;
   //}
-  //compute_hull(old, new, &hull);
+  // compute_hull(old, new, &hull);
 
-  //invader_army.x = new.x1;
-  //invader_army.y = new.y1;
+  // invader_army.x = new.x1;
+  // invader_army.y = new.y1;
   //// Start the draw call
-  //lcddev.select(1);
-  //LCD_SetWindow(invader_army.x, invader_army.y, invader_army.x + invader_army.width - 1,
+  // lcddev.select(1);
+  // LCD_SetWindow(invader_army.x, invader_army.y, invader_army.x +
+  // invader_army.width - 1,
   //              invader_army.y + invader_army.height - 1);
-  //LCD_WriteData16_Prepare();
+  // LCD_WriteData16_Prepare();
 
   //// Draw the army
-  //for (int army_y = INVADERS_HEIGHT - 1; army_y >= 0; army_y--) {
+  // for (int army_y = INVADERS_HEIGHT - 1; army_y >= 0; army_y--) {
   //  for (int sprite_y = invader1_a_height - 1; sprite_y >= 0; sprite_y--) {
   //    for (int army_x = INVADERS_WIDTH - 1; army_x >= 0; army_x--) {
-  //      uint8_t invader_type = invader_army.units[army_x + army_y * INVADERS_WIDTH];
-  //      for (int sprite_x = invader1_a_width - 1; sprite_x >= 0; sprite_x--) {
+  //      uint8_t invader_type = invader_army.units[army_x + army_y *
+  //      INVADERS_WIDTH]; for (int sprite_x = invader1_a_width - 1; sprite_x >=
+  //      0; sprite_x--) {
   //        // Select which sprite to draw from
   //        switch (invader_type) {
   //        case 1:
@@ -170,7 +169,6 @@ void update_invaders() {
   //  }
   //}
   //// Close down the communication with the lcd
-  //LCD_WriteData16_End();
-  //lcddev.select(0);
-
+  // LCD_WriteData16_End();
+  // lcddev.select(0);
 }

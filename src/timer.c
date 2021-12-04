@@ -18,5 +18,5 @@ void TIM6_DAC_IRQHandler(void) {
     TIM6->SR &= ~TIM_SR_UIF;
     glbcnt++;
     if(glbcnt > 59) glbcnt = 0;
-    update_flags();
+    //update_flags();
 }

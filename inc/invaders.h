@@ -12,19 +12,12 @@
 
 
 typedef struct {
-  // This is the bottom right corner of the
-  uint16_t x, y;
-  // Size of the army
-  uint16_t width, height;
+  // The bounding box for the invaders
+  Rect bbox;
   // How the army will move
   int8_t step, drop;
-  // The state of each unit in the army
-  uint8_t units[INVADERS_COUNT];
-  // Pointers to each unit's sprite data
-  uint16_t *unit_sprites[INVADERS_SPRITE_COUNT];
-  // Evil bit fuckery
-  // Two sprite pointers xor'd to to toggle sprites
-  uint32_t unit_sprite_switch_keys[INVADERS_SPRITE_COUNT];
+  // Each sprite for the invaders
+  Sprite units[INVADERS_COUNT];
 } InvaderArmy;
 
 extern InvaderArmy invader_army;
