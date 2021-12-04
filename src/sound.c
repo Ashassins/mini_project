@@ -142,7 +142,7 @@ void TIM16_IRQHandler() {
     if (melody_idx >= melody2_len) {
       melody_idx = 0; // redundant
       melody_select = 1;
-      nxt_note = melody1[melody_idx - 1];
+      nxt_note = melody1[melody_idx];
       nxt_dur = noteDurations1[melody_idx];
     } else {
       nxt_note = melody2[melody_idx - 1];
@@ -157,7 +157,7 @@ void TIM16_IRQHandler() {
       nxt_note = melody2[melody_idx - 1];
       nxt_dur = noteDurations2[melody_idx];
     } else {
-      nxt_note = melody1[melody_idx - 1];
+      nxt_note = melody1[melody_idx];
       nxt_dur = noteDurations1[melody_idx];
     }
   }//*/
