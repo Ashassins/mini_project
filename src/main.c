@@ -35,10 +35,12 @@ void TIM6_DAC_IRQHandler(void) {
     TIM6->SR &= ~TIM_SR_UIF;
     glbcnt++;
     if(glbcnt > 30) glbcnt = 0;
+    update_flags();
 }
 
 
 int main(void) {
+  init_nunchuk();
   init_tim6();
   setup_music();
   start_music();
@@ -52,10 +54,11 @@ int main(void) {
   draw_sprite(&invader);
 
   // Init i2c and nunchuk
-  //init_nunchuk();
+  //
   for (;;) {
      //print_nunchuk_xy(100,100);
     // Draw the test sprite
+    print_flags(100,100);
     draw_sprite(&invader);
     move_sprite(&invader, 5, 5);
     // Change ("animate") the test sprite

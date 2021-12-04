@@ -1,7 +1,13 @@
 #include "stm32f0xx.h"
 #include "lcd.h"
+#include "nunchuk.h"
 #include <string.h> // for memset() declaration
 #include <math.h>   // for MA_PI
+
+int flg_mv_right = 0;
+int flg_mv_left = 0;
+int flg_v = 0;
+int flg_c = 0;
 
 // Be sure to change this to your login...
 const char login[] = "subbiah";
@@ -426,6 +432,43 @@ void print_nunchuk_xy(int x, int y) {
     LCD_DrawString(x,y,0xFFFF,0x0000, full_out, 16, 0);
 }
 
+void update_flags(void) {
+    uint8_t buffer[8] = {0};
+    memset(buffer, 0, 8);
+    read_nunchuk(buffer);
+    if (buffer[0] > MID_VAL_X + DEAD_ZONE) {
+        // Move right
+        flg_mv_right = 1;
+        flg_mv_left = 0;
+    } else if (buffer[0] < MID_VAL_X - DEAD_ZONE) {
+        // Move left
+        flg_mv_left = 1;
+        flg_mv_right = 0;
+    } else {
+        // Don't Move
+        flg_mv_left = 0;
+        flg_mv_right = 0;
+    }
+    if (buffer[5] & 0x02) {
+        flg_c = 1;
+    } else {
+        flg_c = 0;
+    }
+    if (buffer[5] & 0x01) {
+        flg_v = 1;
+    } else {
+        flg_v = 0;
+    }
+}
+
+void print_flags(int x, int y) {
+    char output[13] = "r: l: c: v: ";
+    output[2] = '0' + flg_mv_right;
+    output[5] = '0' + flg_mv_left;
+    output[8] = '0' + flg_c;
+    output[11] = '0' + flg_v;
+    LCD_DrawString(x,y,0xFFFF,0x0000, output, 16, 0);
+}
 
 //int main(void)
 //{
