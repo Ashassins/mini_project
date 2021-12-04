@@ -8,7 +8,7 @@ void init_sound_dma();
 
 uint16_t melody_idx;
 uint8_t melody_select;
-
+uint16_t nxt_note, nxt_dur;
 /*
  * Invokes setup procedures for music module
  */
@@ -65,7 +65,7 @@ void init_tim2() {
   // Set no prescale for max arr freq
   TIM2->PSC = 0;
   // Calculate arr value for desired freq
-  TIM2->ARR = melody1[0];
+  TIM2->ARR = melody1[0]; // -1 calculated in constant
   // Buffer ARR value
   TIM2->CR1 |= TIM_CR1_ARPE;
   // Enable dma
@@ -88,7 +88,7 @@ void init_tim16() {
   TIM16->CR2 |= TIM_CR2_MMS_1;
 
   TIM16->PSC = 48000 - 1;
-  TIM16->ARR = noteDurations1[melody_idx]; //- 1;
+  TIM16->ARR = (noteDurations1[melody_idx]) - 1; //- 1;
   TIM16->CR1 |= TIM_CR1_ARPE;
   TIM16->DIER |= TIM_DIER_UIE;
   NVIC->ISER[0] |= 1 << TIM16_IRQn;
@@ -110,9 +110,9 @@ void init_sound_dma() {
   // We want to copy SAMPLES elements
   dma->CNDTR = SAMPLES;
   // from array
-  dma->CMAR = (uint32_t)wavetable;
+  dma->CMAR = (uint32_t) wavetable;
   // to the right aligned 12 bit dac
-  dma->CPAR = (uint32_t)&DAC->DHR12R1;
+  dma->CPAR = (uint32_t) &DAC->DHR12R1;
   // Setup dma for circular, mem to periph, increment memory, set msize to 16
   // and psize to 16
   dma->CCR |= DMA_CCR_CIRC | DMA_CCR_DIR | DMA_CCR_MINC | DMA_CCR_MSIZE_0 |
@@ -129,15 +129,13 @@ void TIM16_IRQHandler() {
   // Status led for lazy debug
   GPIOC->BSRR = GPIO_BSRR_BR_9 | (GPIO_BSRR_BS_9 & ~(GPIOC->ODR));
 
-  uint16_t nxt_note, nxt_dur;
   nxt_note = melody1[melody_idx];
   nxt_dur = noteDurations1[melody_idx];
-
-  if (melody_idx >= melody1_len) {
+  melody_idx += 1;
+  if (melody_idx > melody1_len) {
       melody_idx = 0;
       //melody_select++;
   }
-  melody_idx += 1;
 
   // Select which note, from which melody to play from
   /*
@@ -175,7 +173,7 @@ void TIM16_IRQHandler() {
 
   // Set the pitch and duration values in the relavant timers
   TIM2->ARR = nxt_note;
-  TIM16->ARR = nxt_dur;
+  TIM16->ARR = nxt_dur - 1;
 }
 
 const uint16_t wavetable[SAMPLES] = {
