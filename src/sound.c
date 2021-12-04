@@ -27,7 +27,7 @@ void setup_music() {
 void start_music() {
   // Reset all of the global vars and enable the timers and dma
   melody_idx = 0;
-  melody_select = 1;
+  melody_select = 0;
   DAC->CR |= DAC_CR_EN1;
   DMA1_Channel2->CCR |= DMA_CCR_EN;
   TIM2->CR1 |= TIM_CR1_CEN;
@@ -65,7 +65,7 @@ void init_tim2() {
   // Set no prescale for max arr freq
   TIM2->PSC = 0;
   // Calculate arr value for desired freq
-  TIM2->ARR = melody1[0]; // -1 calculated in constant
+  TIM2->ARR = full_melody[0]; // -1 calculated in constant
   // Buffer ARR value
   TIM2->CR1 |= TIM_CR1_ARPE;
   // Enable dma
@@ -88,7 +88,7 @@ void init_tim16() {
   TIM16->CR2 |= TIM_CR2_MMS_1;
 
   TIM16->PSC = 48000 - 1;
-  TIM16->ARR = (noteDurations1[0]) - 1; //- 1;
+  TIM16->ARR = (full_durations[0]) - 1; //- 1;
   TIM16->CR1 |= TIM_CR1_ARPE;
   TIM16->DIER |= TIM_DIER_UIE;
   NVIC->ISER[0] |= 1 << TIM16_IRQn;
@@ -128,36 +128,41 @@ void TIM16_IRQHandler() {
   TIM16->SR &= ~TIM_SR_UIF;
   // Status led for lazy debug
   GPIOC->BSRR = GPIO_BSRR_BR_9 | (GPIO_BSRR_BS_9 & ~(GPIOC->ODR));
-  /*
-  nxt_note = melody1[melody_idx-1];
-  nxt_dur = noteDurations1[melody_idx];
 
-  if (melody_idx >= melody1_len) {
+  melody_idx += 1; 
+  if (melody_idx > full_melody_len) {
       melody_idx = 0;
-      melody_select = 2;
+      //melody_select = 2;
   } 
-  */
+  if (melody_idx == 0) {
+    nxt_note = full_melody[melody_idx];
+  } else {
+    nxt_note = full_melody[melody_idx-1];
+  }
+  nxt_dur = full_durations[melody_idx];
+
   // Select which note, from which melody to play from
+  /*
   if (melody_select == 2) {
     if (melody_idx >= melody2_len) {
-      melody_idx = 0; // redundant
-      melody_select = 1;
-      nxt_note = melody1[0];
+      melody_idx = 0;
+      melody_select = 0;
+      nxt_note = melody1[melody_idx];
       nxt_dur = noteDurations1[melody_idx];
     } else {
-      nxt_note = melody2[melody_idx - 1];
+      nxt_note = melody2[melody_idx];
       nxt_dur = noteDurations2[melody_idx];
     }
   } else {
     if (melody_idx >= melody1_len) {
       melody_idx = 0;
-      melody_select = 1;
+      melody_select++;
     }
     if (melody_select == 2) {
-      nxt_note = melody2[melody_idx - 1];
+      nxt_note = melody2[melody_idx];
       nxt_dur = noteDurations2[melody_idx];
     } else {
-      nxt_note = melody1[0];
+      nxt_note = melody1[melody_idx];
       nxt_dur = noteDurations1[melody_idx];
     }
   }//*/
@@ -212,6 +217,41 @@ const uint16_t melody2[] = {
     NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
     NOTE_E5,    NOTE_A5,    NOTE_A5,      NOTE_GS5/**/};
 
+const uint16_t full_melody[] = {// 19
+    NOTE_E5,    NOTE_B4,    NOTE_C5,      NOTE_D5,
+    NOTE_C5,    NOTE_B4,    NOTE_A4,      REST,
+    NOTE_A4,
+    NOTE_C5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
+    NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
+    NOTE_C5,    NOTE_A4,    REST,
+    NOTE_A4, /**/ REST, // 19
+    NOTE_D5,    NOTE_F5,    NOTE_A5,      NOTE_G5,
+    NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
+    NOTE_D5,    NOTE_C5,    NOTE_B4,      REST,
+    NOTE_B4,
+    NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_C5,
+    NOTE_A4,    REST,
+    NOTE_A4,/**/NOTE_E5,      NOTE_B4, // 21
+    NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_D5,
+    NOTE_C5,    NOTE_B4,    NOTE_A4,      REST,
+    NOTE_A4,
+    NOTE_C5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
+    NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
+    NOTE_C5,    NOTE_A4,    REST,
+    NOTE_A4, /**/ REST,   // 20
+    NOTE_D5,    NOTE_F5,    NOTE_A5,      NOTE_G5,
+    NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
+    NOTE_F5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
+    NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
+    NOTE_C5,    NOTE_A4,    REST, 
+    NOTE_A4, /**/ NOTE_E5, // 8
+    NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
+    NOTE_A4,    NOTE_GS4,   NOTE_B4, /**/ NOTE_E5, //9
+    NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
+    NOTE_E5,    NOTE_A5,    REST,
+    NOTE_A5,    NOTE_GS5,   REST/**/};
+
+
 // 19 19 21 20 8 9
 const uint16_t noteDurations1[] = {
     QUARTER_NOTE,   EIGHTH_NOTE,    EIGHTH_NOTE,      QUARTER_NOTE,
@@ -241,6 +281,40 @@ const uint16_t noteDurations2[] = {
     HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        QUARTER_NOTE,
     QUARTER_NOTE,   QUARTER_NOTE,   QUARTER_NOTE,     WHOLE_NOTE/**/};
 
+const uint16_t full_durations[] = {
+  QUARTER_NOTE,   EIGHTH_NOTE,    EIGHTH_NOTE,      QUARTER_NOTE,
+  EIGHTH_NOTE,    EIGHTH_NOTE,    QUARTER_NOTE,     TOUNGED,
+  EIGHTH_NOTE,
+  EIGHTH_NOTE,    QUARTER_NOTE,   EIGHTH_NOTE,      EIGHTH_NOTE,
+  DOT_QUART_NOTE, EIGHTH_NOTE,    QUARTER_NOTE,     QUARTER_NOTE,
+  QUARTER_NOTE,   QUARTER_NOTE,   TOUNGED,
+  HALF_NOTE, /**/   EIGHTH_NOTE,  
+  QUARTER_NOTE,   EIGHTH_NOTE,    QUARTER_NOTE,     EIGHTH_NOTE,
+  EIGHTH_NOTE,    DOT_QUART_NOTE, EIGHTH_NOTE,      QUARTER_NOTE,
+  EIGHTH_NOTE,    EIGHTH_NOTE,    QUARTER_NOTE,     TOUNGED,
+  EIGHTH_NOTE,
+  EIGHTH_NOTE,    QUARTER_NOTE,   QUARTER_NOTE,     QUARTER_NOTE,
+  QUARTER_NOTE,   TOUNGED,
+  HALF_NOTE, /**/ QUARTER_NOTE,     EIGHTH_NOTE,
+  EIGHTH_NOTE,    EIGHTH_NOTE,    SIXTEENTH_NOTE,   SIXTEENTH_NOTE,
+  EIGHTH_NOTE,    EIGHTH_NOTE,    QUARTER_NOTE,     TOUNGED,
+  EIGHTH_NOTE,
+  EIGHTH_NOTE,    QUARTER_NOTE,   EIGHTH_NOTE,      EIGHTH_NOTE,
+  DOT_QUART_NOTE, EIGHTH_NOTE,    QUARTER_NOTE,     QUARTER_NOTE,
+  QUARTER_NOTE,   QUARTER_NOTE,   TOUNGED,
+  HALF_NOTE, /**/   EIGHTH_NOTE,
+  QUARTER_NOTE,   EIGHTH_NOTE,    QUARTER_NOTE,     EIGHTH_NOTE,
+  EIGHTH_NOTE,    DOT_QUART_NOTE, EIGHTH_NOTE,      EIGHTH_NOTE,
+  SIXTEENTH_NOTE, SIXTEENTH_NOTE, EIGHTH_NOTE,      EIGHTH_NOTE,
+  DOT_QUART_NOTE, EIGHTH_NOTE,    QUARTER_NOTE,     QUARTER_NOTE,
+  QUARTER_NOTE,   QUARTER_NOTE,   TOUNGED,
+  HALF_NOTE, /**/   HALF_NOTE,
+  HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        HALF_NOTE,
+  HALF_NOTE,      HALF_NOTE,      HALF_NOTE, /**/   HALF_NOTE,
+  HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        QUARTER_NOTE,
+  QUARTER_NOTE,   QUARTER_NOTE,   TOUNGED,
+  QUARTER_NOTE,    WHOLE_NOTE,     EIGHTH_NOTE/**/};
+
 const uint16_t melody1_len = sizeof(melody1) / sizeof(melody1[0]);
 const uint16_t melody2_len = sizeof(melody2) / sizeof(melody2[0]);
-
+const uint16_t full_melody_len = sizeof(full_melody) / sizeof(full_melody[0]);
