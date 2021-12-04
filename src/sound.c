@@ -110,9 +110,9 @@ void init_sound_dma() {
   // We want to copy SAMPLES elements
   dma->CNDTR = SAMPLES;
   // from array
-  dma->CMAR = (uint32_t)wavetable;
+  dma->CMAR = (uint32_t) wavetable;
   // to the right aligned 12 bit dac
-  dma->CPAR = (uint32_t)&DAC->DHR12R1;
+  dma->CPAR = (uint32_t) &DAC->DHR12R1;
   // Setup dma for circular, mem to periph, increment memory, set msize to 16
   // and psize to 16
   dma->CCR |= DMA_CCR_CIRC | DMA_CCR_DIR | DMA_CCR_MINC | DMA_CCR_MSIZE_0 |
