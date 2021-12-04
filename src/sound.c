@@ -8,7 +8,7 @@ void init_sound_dma();
 
 uint16_t melody_idx;
 uint8_t melody_select;
-
+uint16_t nxt_note, nxt_dur;
 /*
  * Invokes setup procedures for music module
  */
@@ -65,7 +65,7 @@ void init_tim2() {
   // Set no prescale for max arr freq
   TIM2->PSC = 0;
   // Calculate arr value for desired freq
-  TIM2->ARR = melody1[0];
+  TIM2->ARR = melody1[0]; // -1 calculated in constant
   // Buffer ARR value
   TIM2->CR1 |= TIM_CR1_ARPE;
   // Enable dma
@@ -129,7 +129,6 @@ void TIM16_IRQHandler() {
   // Status led for lazy debug
   GPIOC->BSRR = GPIO_BSRR_BR_9 | (GPIO_BSRR_BS_9 & ~(GPIOC->ODR));
 
-  uint16_t nxt_note, nxt_dur;
   nxt_note = melody1[melody_idx];
   nxt_dur = noteDurations1[melody_idx];
   melody_idx += 1;
@@ -174,7 +173,7 @@ void TIM16_IRQHandler() {
 
   // Set the pitch and duration values in the relavant timers
   TIM2->ARR = nxt_note;
-  TIM16->ARR = nxt_dur;
+  TIM16->ARR = nxt_dur - 1;
 }
 
 const uint16_t wavetable[SAMPLES] = {
