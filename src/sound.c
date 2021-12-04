@@ -26,7 +26,7 @@ void setup_music() {
  */
 void start_music() {
   // Reset all of the global vars and enable the timers and dma
-  //melody_idx = 0;
+  melody_idx = 0;
   melody_select = 0;
   DAC->CR |= DAC_CR_EN1;
   DMA1_Channel2->CCR |= DMA_CCR_EN;
