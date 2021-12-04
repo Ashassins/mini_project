@@ -1,6 +1,7 @@
 #include "stm32f0xx.h"
 #include "lcd.h"
 #include "nunchuk.h"
+#include <stdint.h>
 #include <string.h> // for memset() declaration
 #include <math.h>   // for MA_PI
 
@@ -15,141 +16,10 @@ const char login[] = "subbiah";
 void nano_wait(unsigned int);
 const char font[];
 
-
-////===========================================================================
-//// 2.1 FROM LAB 8
-//// ..........................................................................
-//// Debouncing a Keypad
-////===========================================================================
-//const char keymap[] = "DCBA#9630852*741";
-//uint8_t hist[16];
-//uint8_t col;
-//char queue[2];
-//int qin;
-//int qout;
-//
-//void drive_column(int);
-//int read_rows();
-//
-//void push_queue(int n) {
-//    n = (n & 0xff) | 0x80;
-//    queue[qin] = n;
-//    qin ^= 1;
-//}
-//
-//uint8_t pop_queue() {
-//    uint8_t tmp = queue[qout] & 0x7f;
-//    queue[qout] = 0;
-//    qout ^= 1;
-//    return tmp;
-//}
-//
-//void update_history(int c, int rows) {
-//    for(int i = 0; i < 4; i++) {
-//        hist[4*c+i] = (hist[4*c+i]<<1) + ((rows>>i)&1);
-//        if (hist[4*c+i] == 1)
-//          push_queue(4*c+i);
-//    }
-//}
-//
-//void init_tim7() {
-//    RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;
-//    TIM7->PSC = 48 - 1;
-//    TIM7->ARR = 1000 - 1;
-//    TIM7->DIER |= TIM_DIER_UIE;
-//    TIM7->CR1 |= TIM_CR1_CEN;
-//    NVIC->ISER[0] |= 1 << TIM7_IRQn;
-//}
-//
-//void TIM7_IRQHandler(void) {
-//    TIM7->SR &= ~TIM_SR_UIF;
-//    int rows = read_rows();
-//    update_history(col, rows);
-//    col = (col + 1) & 3;
-//    drive_column(col);
-//}
-//
-//char get_keypress() {
-//    for(;;) {
-//        asm volatile ("wfi" : :);   // wait for an interrupt
-//        if (queue[qout] == 0)
-//            continue;
-//        return keymap[pop_queue()];
-//    }
-//}
-
-
-////===========================================================================
-//// SPI DMA LED Array
-////===========================================================================
-//uint16_t msg[8] = { 0x0000,0x0100,0x0200,0x0300,0x0400,0x0500,0x0600,0x0700 };
-//
-//void init_spi2(void) {
-//    // Enable RCC to SPI2
-//    RCC->APB1ENR |= RCC_APB1ENR_SPI2EN;
-//    // Enable GPIO Alternate function for PB12,13,15
-//    // Enable RCC to GPIOB
-//    RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-//    // Clear PB12,13,15
-//    GPIOB->MODER &= ~0xCF000000; // Clear PB0-10
-//    // GPIOB PB12,13,15 Alternate Function
-//    GPIOB->MODER |= 0x8a000000;
-//    // PB12: AF0
-//    GPIOB->AFR[1] &= ~(0xf << (4*(12-8)));
-//    GPIOB->AFR[1] |=   0x0 << (4*(12-8));
-//    // PB13: AF0
-//    GPIOB->AFR[1] &= ~(0xf << (4*(13-8)));
-//    GPIOB->AFR[1] |=   0x0 << (4*(13-8));
-//    // PB15: AF0
-//    GPIOB->AFR[1] &= ~(0xf << (4*(15-8)));
-//    GPIOB->AFR[1] |=   0x0 << (4*(15-8));
-//    SPI2->CR1 &= ~SPI_CR1_SPE; // Clear CR1_SPE
-//    SPI2->CR1 |= SPI_CR1_MSTR | SPI_CR1_BR; // Set baud rate 111
-//    // DS = 1111
-//    SPI2->CR2 = SPI_CR2_TXDMAEN | SPI_CR2_SSOE | SPI_CR2_NSSP | SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0;
-////    SPI2->CR2 |= SPI_CR2_SSOE | SPI_CR2_NSSP;
-////    SPI2->CR1 |= SPI_CR2_TXDMAEN;
-//    SPI2->CR1 |= SPI_CR1_SPE;
-//}
-//
-//void setup_spi2_dma(void) {
-//    // Enable RCC to DMA
-//    RCC->AHBENR |= RCC_AHBENR_DMAEN;
-//    DMA1_Channel5->CCR &= ~DMA_CCR_EN;  // Turn off DMA Channel before config
-//    DMA1_Channel5->CPAR = (uint32_t) &(SPI2->DR);
-//    DMA1_Channel5->CMAR = (uint32_t) msg;
-//    DMA1_Channel5->CNDTR = 8;
-//    DMA1_Channel5->CCR |= DMA_CCR_DIR;
-//    DMA1_Channel5->CCR |= DMA_CCR_MINC;
-//    DMA1_Channel5->CCR |= DMA_CCR_MSIZE_0;
-//    DMA1_Channel5->CCR |= DMA_CCR_PSIZE_0;
-//    DMA1_Channel5->CCR |= DMA_CCR_CIRC;
-//}
-//
-//void enable_spi2_dma(void) {
-//    // Enable DMA
-//    DMA1_Channel5->CCR |= DMA_CCR_EN;
-//}
-//
-//void append_display(char val) {
-//    for (int i = 1; i < sizeof(msg); i++) {
-//        msg[i-1] &= ~0xff;
-//        msg[i-1] |= (i-1)<<8;
-//        msg[i-1] |= (msg[i] & 0xff);
-//    }
-//    msg[7] &= ~0xff;
-//    msg[7] |= 7<<8;
-//    msg[7] |= val;
-//}
-
-
-//===========================================================================
-// THIS LAB (9)
-// ..........................................................................
-// 2.2 Initialize I2C
-//===========================================================================
 #define GPIOEX_ADDR 0x00  // ENTER GPIO EXPANDER I2C ADDRESS HERE
 #define EEPROM_ADDR 0x00  // ENTER EEPROM I2C ADDRESS HERE
+
+uint8_t NUNCHUK_INIT = 0;
 
 void init_i2c(void) {
     RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
@@ -406,16 +276,20 @@ void init_nunchuk(void) {
     i2c_senddata(0x52, init_data_1, 2);
     uint8_t init_data_2[2] = {0xFB, 0x00};
     i2c_senddata(0x52, init_data_2, 2);
+    NUNCHUK_INIT = 1;
 }
 
 void read_nunchuk(uint8_t *buffer) {
+  if (NUNCHUK_INIT) {
     uint8_t addr[1] = {0x00};
     i2c_senddata(0x52, addr, 1);
     nano_wait(200000);
     i2c_recvdata(0x52, buffer, 8);
+  }
 }
 
 void print_nunchuk_xy(int x, int y) {
+  if(NUNCHUK_INIT) {
     uint8_t buffer[8] = {0};
     memset(buffer, 0, 8);
     read_nunchuk(buffer);
@@ -430,9 +304,11 @@ void print_nunchuk_xy(int x, int y) {
     strcat(full_out, output_x);
     strcat(full_out, output_y);
     LCD_DrawString(x,y,0xF000,0x0000, full_out, 16, 0);
+  }
 }
 
 void update_flags(void) {
+  if(NUNCHUK_INIT) {
     uint8_t buffer[8] = {0};
     memset(buffer, 0, 8);
     read_nunchuk(buffer);
@@ -459,6 +335,7 @@ void update_flags(void) {
     } else {
         flg_v = 1;
     }
+  }
 }
 
 void print_flags(int x, int y) {
