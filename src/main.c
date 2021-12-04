@@ -56,7 +56,7 @@ void draw_score(int x, int y) {
 }
 
 int main(void) {
-  //init_nunchuk();
+  init_nunchuk();
   init_tim6();
   setup_music();
   start_music();
@@ -112,7 +112,7 @@ int main(void) {
             teleport_sprite((int)((player.bbox.x2 + player.bbox.x1) / 2), player.bbox.y1 + 10, &shot);
             draw_sprite(&shot);
         }
-        if (shot.bbox.y2 >= (LCD_H + SHOT_SPEED)) {
+        if (shot.bbox.y2 >= (LCD_H - SHOT_SPEED)) {
             teleport_sprite(1000, 1000, &shot);
         } else if (shot.bbox.x1 != 1000) {
             move_sprite(&shot, 0, SHOT_SPEED, 0);
