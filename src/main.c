@@ -69,9 +69,9 @@ int main(void) {
     invader.sprite_data =
         (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
     if (flg_mv_right) {
-    	move_sprite(&invader, -5, 0);
+    	move_sprite(&invader, -10, 0);
     } else if (flg_mv_left) {
-    	move_sprite(&invader, 5, 0);
+    	move_sprite(&invader, 10, 0);
     }
     // Draw the invading army
     //draw_invaders();
