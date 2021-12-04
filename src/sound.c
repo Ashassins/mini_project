@@ -27,7 +27,7 @@ void setup_music() {
 void start_music() {
   // Reset all of the global vars and enable the timers and dma
   melody_idx = 0;
-  melody_select = 0;
+  melody_select = 1;
   DAC->CR |= DAC_CR_EN1;
   DMA1_Channel2->CCR |= DMA_CCR_EN;
   TIM2->CR1 |= TIM_CR1_CEN;
@@ -128,38 +128,36 @@ void TIM16_IRQHandler() {
   TIM16->SR &= ~TIM_SR_UIF;
   // Status led for lazy debug
   GPIOC->BSRR = GPIO_BSRR_BR_9 | (GPIO_BSRR_BS_9 & ~(GPIOC->ODR));
-
-  melody_idx += 1; 
+  /*
   nxt_note = melody1[melody_idx-1];
   nxt_dur = noteDurations1[melody_idx];
 
   if (melody_idx >= melody1_len) {
       melody_idx = 0;
-      //melody_select = 2;
+      melody_select = 2;
   } 
-
+  */
   // Select which note, from which melody to play from
-  /*
   if (melody_select == 2) {
     if (melody_idx >= melody2_len) {
-      melody_idx = 0;
-      melody_select = 0;
-      nxt_note = melody1[melody_idx];
+      melody_idx = 0; // redundant
+      melody_select = 1;
+      nxt_note = melody1[melody_idx - 1];
       nxt_dur = noteDurations1[melody_idx];
     } else {
-      nxt_note = melody2[melody_idx];
+      nxt_note = melody2[melody_idx - 1];
       nxt_dur = noteDurations2[melody_idx];
     }
   } else {
     if (melody_idx >= melody1_len) {
       melody_idx = 0;
-      melody_select++;
+      melody_select = 1;
     }
     if (melody_select == 2) {
-      nxt_note = melody2[melody_idx];
+      nxt_note = melody2[melody_idx - 1];
       nxt_dur = noteDurations2[melody_idx];
     } else {
-      nxt_note = melody1[melody_idx];
+      nxt_note = melody1[melody_idx - 1];
       nxt_dur = noteDurations1[melody_idx];
     }
   }//*/
