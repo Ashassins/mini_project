@@ -44,4 +44,23 @@ void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y) {
   new.y2 += mov_y;
   compute_hull(old, new, &hull);
 
+  uint16_t height = s->bbox.y2 - s->bbox.y1;
+  uint16_t widht = s->bbox.x2 - s->bbox.x1;
+  uint16_t x2 = s->bbox.x2, y2 = s->bbox.y2;
+
+  for(uint16_t y = hull.y2 - hull.y1; y >= 0; y--) {
+    for(uint16_t x = hull.x2 - hull.x1; x >= 0; x--) {
+
+      int16_t draw_y = y2 - y;
+      int16_t draw_x = x2 - x;
+
+      if(draw_x >= 0 && draw_y >= 0) {
+        //LCD_WriteData16
+      } else {
+        LCD_WriteData16(0x0);
+      }
+
+    }
+  }
+
 }

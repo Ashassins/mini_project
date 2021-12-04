@@ -24,13 +24,8 @@ int main(void) {
   LCD_Setup();
   LCD_Clear(0x0);
   // Little test guy
-  Sprite invader = {.x = 40,
-                    .y = 40,
-                    .height = invader1_a_height,
-                    .width = invader1_a_width,
-                    .sprite_data = (uint16_t *)invader1_a,
-                    .sprite_swap_key =
-                        ((uint32_t)invader1_a) ^ ((uint32_t)invader1_b)};
+  Sprite invader;
+  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
   // Initialize the invader army
   init_invaders();
   // Init i2c and nunchuk
