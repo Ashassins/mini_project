@@ -26,7 +26,7 @@ void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y, uint8_t force) {
   old = s->bbox;
   new = s->bbox;
 
-  if((mov_x != 0 || mov_y != 0) && !force) {
+  if(mov_x != 0 || mov_y != 0  || force) {
     new.x1 += mov_x;
     new.x2 += mov_x;
     new.y1 += mov_y;
