@@ -422,14 +422,14 @@ void print_nunchuk_xy(int x, int y) {
     char output_x[10] = "x:   ";
     char output_y[10] = " y:   ";
     char full_out[20] = "";
-    LCD_DrawString(100,100,0xFFFF,0x0000, "           ", 16, 0);
+    LCD_DrawString(100,100,0xF000,0x0000, "           ", 16, 0);
     int n_x = buffer[0];
     int n_y = buffer[1];
     itoa(n_x, &output_x[2], 10);
     itoa(n_y, &output_y[3], 10);
     strcat(full_out, output_x);
     strcat(full_out, output_y);
-    LCD_DrawString(x,y,0xFFFF,0x0000, full_out, 16, 0);
+    LCD_DrawString(x,y,0xF000,0x0000, full_out, 16, 0);
 }
 
 void update_flags(void) {
@@ -467,7 +467,7 @@ void print_flags(int x, int y) {
     output[6] = '0' + flg_mv_left;
     output[10] = '0' + flg_c;
     output[14] = '0' + flg_v;
-    LCD_DrawString(x,y,0xFFFF,0x0000, output, 16, 0);
+    LCD_DrawString(x,y,0xF000,0x0000, output, 16, 0);
 }
 
 //int main(void)

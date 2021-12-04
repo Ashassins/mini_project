@@ -40,6 +40,7 @@ static inline void nano_wait(unsigned int n) {
 //}
 
 void print_glbcnt(int x, int y) {
+	int toggle = 0;
     char output[5] = "G:  ";
     itoa(glbcnt, &output[2], 10);
     LCD_DrawString(x,y,0xFFFF,0x0000, output, 16, 0);
@@ -63,41 +64,45 @@ int main(void) {
   //
   uint16_t mov_x = 5, mov_y = 5;
   for (;;) {
-     //print_nunchuk_xy(100,100);
-    // Draw the test sprite
-    print_flags(175,1);
-    print_glbcnt(230,1);
-    move_sprite(&invader, mov_x, mov_y);
-    if(invader.bbox.x1 <= 0 || invader.bbox.x2 >= LCD_W) {
-      mov_x = -mov_x;
-    }
-    if(invader.bbox.y1 <= 0 || invader.bbox.y2 >= LCD_H){
-      mov_y = - mov_y;
-    }
-	invader.sprite_data =
-        (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
-
     if ((glbcnt + 1) % 15 == 0) {
-    	LCD_DrawString(230,300,0xFFFF,0x0000, "Don't mind the spaz monke uwu", 16, 0);
+    	// -----4FPS (BASICALLY FREE)-----
+    	LCD_DrawString(230,300,0x0F00,0x0000, "Don't mind the spaz monke uwu", 16, 0);
     	// Change ("animate") the test sprite
     	player.sprite_data =
             (uint16_t *)(((uint32_t)player.sprite_data) ^ player.sprite_swap_key);
-    	move_sprite(&player, 0, 0);
+    	invader.sprite_data =
+            (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
         // Draw the invading army
         draw_invaders();
         // Animate the army
         update_invaders();
-        // Wait until global counter hits correct value
     }
 
-    if (flg_mv_right && player.bbox.x1 > 0) {
-    	move_sprite(&player, -1, 0);
-    } else if (flg_mv_left && player.bbox.x2 < (LCD_W - 1)) {
-    	move_sprite(&player, 1, 0);
+    if ((glbcnt + 1) % 4 == 0) {
+    	// -----15FPS-----
+        print_flags(175,1);
+//        print_glbcnt(230,1);
     }
 
-    if (flg_v) {
+    if ((glbcnt + 1) % 2 == 0) {
+		// -----30FPS-----
+        if (flg_mv_right && player.bbox.x1 > 0) {
+        	move_sprite(&player, -2, 0);
+        } else if (flg_mv_left && player.bbox.x2 < (LCD_W - 1)) {
+        	move_sprite(&player, 2, 0);
+        } else {
+        	move_sprite(&player, 0, 0);
+        }
+	}
 
+	// -----60FPS (VERY COSTLY)-----
+
+    move_sprite(&invader, mov_x, mov_y);
+    if(invader.bbox.x1 <= 0 || invader.bbox.x2 >= (LCD_W - 5)) {
+	  mov_x = -mov_x;
+    }
+    if(invader.bbox.y1 <= 0 || invader.bbox.y2 >= LCD_H){
+	  mov_y = - mov_y;
     }
 
     while((glbcnt + 1) % 1 != 0);
