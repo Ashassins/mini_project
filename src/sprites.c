@@ -83,3 +83,18 @@ void teleport_sprite(uint16_t x, uint16_t y, Sprite *s) {
     s->bbox.x2 = x + width - 1;
     s->bbox.y2 = y + height - 1;
 }
+
+void clear_sprite(Sprite *s) {
+  lcddev.select(1);
+  LCD_SetWindow(s->bbox.x1, s->bbox.y1, s->bbox.x2, s->bbox.y2);
+  LCD_WriteData16_Prepare();
+  uint16_t h = s->bbox.y2 - s->bbox.y1;
+  uint16_t w = s->bbox.x2 - s->bbox.x1;
+  for(uint16_t i = 0; i < h; i++) {
+    for(uint16_t j  = 0; j < w; j++) {
+      LCD_WriteData16(0x0);
+    }
+  }
+  LCD_WriteData16_End();
+  lcddev.select(0);
+}
