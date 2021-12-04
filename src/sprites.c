@@ -47,23 +47,34 @@ void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y) {
   new.y2 += mov_y;
   compute_hull(old, new, &hull);
 
-  uint16_t height = s->bbox.y2 - s->bbox.y1;
-  uint16_t widht = s->bbox.x2 - s->bbox.x1;
-  uint16_t x2 = s->bbox.x2, y2 = s->bbox.y2;
+  // Magic screen incatation
+  lcddev.select(1);
+  LCD_SetWindow(hull.x1, hull.y1, hull.x2, hull.y2);
+  LCD_WriteData16_Prepare();
 
+  s->bbox = new;
+  uint16_t width = s->bbox.x2 - s->bbox.x1 + 1;
   for(uint16_t y = hull.y2; y >= hull.y1; y--) {
     for(uint16_t x = hull.x2; x >= hull.x1; x--) {
-
-      int16_t draw_y = y2 - y;
-      int16_t draw_x = x2 - x;
-
-      if(draw_x >= 0 && draw_y >= 0) {
-        //LCD_WriteData16
+      if(contains(x, y, old)) {
+        uint16_t draw_x = x - hull.x1;
+        uint16_t draw_y = y - hull.y1;
+        LCD_WriteData16(s->sprite_data[draw_x + draw_y * width]);
       } else {
         LCD_WriteData16(0x0);
       }
+      //int16_t draw_y = y2 - y;
+      //int16_t draw_x = x2 - x;
 
+      //if(draw_x >= 0 && draw_y >= 0) {
+      //  //LCD_WriteData16
+      //} else {
+      //  LCD_WriteData16(0x0);
+      //}
     }
   }
+
+  LCD_WriteData16_End();
+  lcddev.select(0);
 
 }
