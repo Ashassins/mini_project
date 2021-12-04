@@ -58,25 +58,25 @@ int main(void) {
      //print_nunchuk_xy(100,100);
     // Draw the test sprite
     print_flags(175,1);
-    move_sprite(&invader, mov_x, mov_y);
-    if(invader.bbox.x1 <= 0 || invader.bbox.x2 >= LCD_W) {
-      mov_x = -mov_x;
-    }
-    if(invader.bbox.y1 <= 0 || invader.bbox.y2 >= LCD_H){
-      mov_y = - mov_y;
-    }
+//    move_sprite(&invader, mov_x, mov_y);
+//    if(invader.bbox.x1 <= 0 || invader.bbox.x2 >= LCD_W) {
+//      mov_x = -mov_x;
+//    }
+//    if(invader.bbox.y1 <= 0 || invader.bbox.y2 >= LCD_H){
+//      mov_y = - mov_y;
+//    }
     // Change ("animate") the test sprite
     invader.sprite_data =
         (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
     if (flg_mv_right) {
-    	move_sprite(&invader, -10, 0);
+    	move_sprite(&invader, -5, 0);
     } else if (flg_mv_left) {
-    	move_sprite(&invader, 10, 0);
+    	move_sprite(&invader, 5, 0);
     }
     // Draw the invading army
-    //draw_invaders();
+    draw_invaders();
     // Animate the army
-    //update_invaders();
+    update_invaders();
     // Wait until global counter hits correct value
     while((glbcnt + 1) % 15 != 0);
     asm volatile("wfi" ::);
