@@ -4,6 +4,7 @@
 #include "sprite_data.h"
 #include "sprites.h"
 #include "nunchuk.h"
+#include "timer.h"
 #include "string.h"
 #include "stm32f0xx.h"
 
@@ -38,7 +39,6 @@ void TIM6_DAC_IRQHandler(void) {
     update_flags();
 }
 
-
 int main(void) {
   init_nunchuk();
   init_tim6();
@@ -48,11 +48,9 @@ int main(void) {
   LCD_Clear(0x0);
   // Little test guy
   Sprite invader;
-  init_sprite(100, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
+  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
   // Initialize the invader army
   init_invaders();
-  draw_sprite(&invader);
-
   // Init i2c and nunchuk
   //
   for (;;) {
@@ -60,7 +58,6 @@ int main(void) {
     // Draw the test sprite
     print_flags(100,100);
     draw_sprite(&invader);
-    move_sprite(&invader, 5, 5);
     // Change ("animate") the test sprite
     invader.sprite_data =
         (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
