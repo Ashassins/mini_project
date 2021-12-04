@@ -53,8 +53,9 @@ int main(void) {
   LCD_Setup();
   LCD_Clear(0x0);
   // Little test guy
-  Sprite invader;
-  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
+  Sprite player;
+//  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
+  init_sprite(40,40,tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
   // Initialize the invader army
   init_invaders();
   // Init i2c and nunchuk
@@ -75,8 +76,8 @@ int main(void) {
 
     if ((glbcnt + 1) % 15 == 0) {
     	// Change ("animate") the test sprite
-        invader.sprite_data =
-            (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
+    	player.sprite_data =
+            (uint16_t *)(((uint32_t)player.sprite_data) ^ player.sprite_swap_key);
         // Draw the invading army
         draw_invaders();
         // Animate the army
@@ -85,9 +86,13 @@ int main(void) {
     }
 
     if (flg_mv_right) {
-    	move_sprite(&invader, -1, 0);
+    	move_sprite(&player, -1, 0);
     } else if (flg_mv_left) {
-    	move_sprite(&invader, 1, 0);
+    	move_sprite(&player, 1, 0);
+    }
+
+    if (flg_v) {
+
     }
 
     while((glbcnt + 1) % 1 != 0);
