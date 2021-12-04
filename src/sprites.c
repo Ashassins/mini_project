@@ -8,9 +8,12 @@ void draw_sprite(Sprite *s) {
   LCD_WriteData16_Prepare();
 
   uint16_t width = s->bbox.x2 - s->bbox.x1;
-  for (int y = s->bbox.y2 - s->bbox.y1; y >= 0; y--) {
+  uint16_t height = s->bbox.y2 - s->bbox.y1;
+  uint16_t px_access = 0;
+  for (int y = height; y >= 0; y--) {
     for (int x = width; x >= 0; x--) {
-      LCD_WriteData16(s->sprite_data[x + y * width]);
+      px_access = x + y * (width + 1);
+      LCD_WriteData16(s->sprite_data[px_access]);
     }
   }
 
@@ -48,8 +51,8 @@ void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y) {
   uint16_t widht = s->bbox.x2 - s->bbox.x1;
   uint16_t x2 = s->bbox.x2, y2 = s->bbox.y2;
 
-  for(uint16_t y = hull.y2 - hull.y1; y >= 0; y--) {
-    for(uint16_t x = hull.x2 - hull.x1; x >= 0; x--) {
+  for(uint16_t y = hull.y2; y >= hull.y1; y--) {
+    for(uint16_t x = hull.x2; x >= hull.x1; x--) {
 
       int16_t draw_y = y2 - y;
       int16_t draw_x = x2 - x;
