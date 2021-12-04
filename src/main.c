@@ -18,7 +18,27 @@ static inline void nano_wait(unsigned int n) {
       : "r0", "cc");
 }
 
+// Timer
+int glbcnt = 0;
+
+void init_tim6() {
+    RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
+    TIM6->PSC = 1600 - 1;
+    TIM6->ARR = 1000 - 1; // (48000000 / 1600) / 1000 = 30
+    TIM6->DIER |= TIM_DIER_UIE;
+    TIM6->CR1 |= TIM_CR1_CEN;
+    NVIC->ISER[0] |= 1 << TIM6_DAC_IRQn;
+}
+
+void TIM6_DAC_IRQHandler(void) {
+    TIM6->SR &= ~TIM_SR_UIF;
+    glbcnt++;
+    if(glbcnt > 30) glbcnt = 0;
+}
+
+
 int main(void) {
+  init_tim6();
   setup_music();
   start_music();
   LCD_Setup();
@@ -34,9 +54,9 @@ int main(void) {
   // Initialize the invader army
   init_invaders();
   // Init i2c and nunchuk
-  init_nunchuk();
+  //init_nunchuk();
   for (;;) {
-    print_nunchuk_xy(100,100);
+     //print_nunchuk_xy(100,100);
     // Draw the test sprite
     draw_sprite(&invader);
     // Change ("animate") the test sprite
@@ -47,7 +67,8 @@ int main(void) {
     // Animate the army
     update_invaders();
     // Wait like a dum-dum because we dont have a global tick setup yet
-    nano_wait(500000000);
-     asm volatile("wfi" ::);
+    //nano_wait(500000000);
+    while(glbcnt != 0);
+    asm volatile("wfi" ::);
   }
 }
