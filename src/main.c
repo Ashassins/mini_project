@@ -63,7 +63,7 @@ int main(void) {
     update_invaders();
     // Wait like a dum-dum because we dont have a global tick setup yet
     //nano_wait(500000000);
-    while(glbcnt != 0);
+    while((glbcnt + 1) % 15 != 0);
     asm volatile("wfi" ::);
   }
 }
