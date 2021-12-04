@@ -135,8 +135,8 @@ void TIM16_IRQHandler() {
 
   if (melody_idx >= melody1_len) {
       melody_idx = 0;
-      //melody_select++;
-  }
+      //melody_select = 2;
+  } 
 
   // Select which note, from which melody to play from
   /*
