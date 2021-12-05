@@ -1,3 +1,4 @@
+#include "bunker.h"
 #include "invaders.h"
 #include "lcd.h"
 #include "sound.h"
@@ -54,6 +55,8 @@ int main(void) {
 //  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
   init_sprite(120, 25, tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
   init_sprite(1000,1000,tank_shot_width, tank_shot_height, (uint16_t*)tank_shot, (uint16_t*)tank_shot, &shot);
+  init_4_bunkers();
+
   // setup five bolts
   Sprite bolts[5];
   for(int i = 0; i < 5; i++) {
