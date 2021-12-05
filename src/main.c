@@ -22,26 +22,6 @@ static inline void nano_wait(unsigned int n) {
       : "r0", "cc");
 }
 
-//// Global counter, modified in timer interrupt
-//int glbcnt = 0;
-//
-//// Timer initializer and interrupt
-//void init_tim6() {
-//    RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
-//    TIM6->PSC = 1600 - 1;
-//    TIM6->ARR = 1000 - 1; // (48000000 / 1600) / 1000 = 30
-//    TIM6->DIER |= TIM_DIER_UIE;
-//    TIM6->CR1 |= TIM_CR1_CEN;
-//    NVIC->ISER[0] |= 1 << TIM6_DAC_IRQn;
-//}
-//
-//void TIM6_DAC_IRQHandler(void) {
-//    TIM6->SR &= ~TIM_SR_UIF;
-//    glbcnt++;
-//    if(glbcnt > 30) glbcnt = 0;
-//    update_flags();
-//}
-
 void print_glbcnt(int x, int y) {
 	int toggle = 0;
     char output[5] = "G:  ";
@@ -56,7 +36,7 @@ void draw_score(int x, int y) {
 }
 
 int main(void) {
-  init_nunchuk();
+  //init_nunchuk();
   init_tim6();
   setup_music();
   start_music();
@@ -67,10 +47,21 @@ int main(void) {
   Sprite player;
   Sprite shot;
   Sprite bunker;
+  Sprite lightning1;
+  Sprite lightning2;
+  Sprite lightning3;
+  Sprite lightning4;
+  Sprite lightning5;
 //  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
   init_sprite(120, 25, tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
   init_sprite(1000,1000,tank_shot_width, tank_shot_height, (uint16_t*)tank_shot, (uint16_t*)tank_shot, &shot);
   init_sprite(100,100,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker);
+  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning1);
+  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning2);
+  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning3);
+  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning4);
+  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning5);
+
   // Initialize the invader army
   init_invaders();
   // Init i2c and nunchuk
