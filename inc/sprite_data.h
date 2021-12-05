@@ -20,6 +20,7 @@ extern const uint8_t bomb_explode_height;
 extern const uint16_t bunker_clean[384];
 extern const uint8_t bunker_clean_width;
 extern const uint8_t bunker_clean_height;
+extern const uint16_t bunker_dead[384];
 
 extern const uint16_t font_0[64];
 extern const uint8_t font_0_width;

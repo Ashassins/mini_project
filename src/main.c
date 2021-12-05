@@ -50,11 +50,9 @@ int main(void) {
 //  Sprite invader;
   Sprite player;
   Sprite shot;
-  Sprite bunker;
 //  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
   init_sprite(120, 25, tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
   init_sprite(1000,1000,tank_shot_width, tank_shot_height, (uint16_t*)tank_shot, (uint16_t*)tank_shot, &shot);
-  init_sprite(100,100,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker);
   // setup five bolts
   Sprite bolts[5];
   for(int i = 0; i < 5; i++) {
@@ -79,7 +77,6 @@ int main(void) {
             (uint16_t *)(((uint32_t)player.sprite_data) ^ player.sprite_swap_key);
 //    	invader.sprite_data =
 //            (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
-    	draw_sprite(&bunker);
     	// Draw the invading army
        // draw_invaders();
         // Animate the army
@@ -133,10 +130,11 @@ int main(void) {
                 teleport_sprite(1000, 1000, &bolts[i]);
             }
 
-            // Collision test
-            if (sprite_coll(&bolts[i], &bunker)) {
+            // Collision test (bumker)
+            /* // old code for bumker test
+            if (sprite_coll(&bolts[i], &bumker)) {
                 teleport_sprite(1000, 1000, &bolts[i]);
-            }
+            }//*/
             if (sprite_coll(&bolts[i], &player)) {
                 teleport_sprite(1000, 1000, &bolts[i]);
                 lives--;
