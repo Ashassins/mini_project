@@ -8,6 +8,7 @@
 #define BUNKER_COUNT 4
 #define BUNKER_WIDTH 76
 #define BUNKER_HEIGHT 5
+#define BUNKER_FULL_HEALTH 4
 
 typedef struct {
     uint8_t id; // each bunker has its own ID

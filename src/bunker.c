@@ -3,26 +3,17 @@
 #include "util.h"
 #include "sprites.h"
 #include "sprite_data.h"
-//#include "sprite_data.c"
-#define BUNKER_WINDOW_TOP_X 260 //LCD_W
-#define BUNKER_WINDOW_TOP_Y 121
-#define BUNKER_WINDOW_BOTTOM_X 0
-#define BUNKER_WINDOW_BOTTOM_Y 65
-#define BUNKER_FULL_HEALTH 4
-//Bunker bunker;
+
 BunkerArray bunkers;
 Sprite clean_bunker;
 
-
-//*/
 int _n_bunkers = sizeof(bunkers.bunkerArray) / sizeof(bunkers.cleanBunker);
-// this needs to be a clean bunker
-void init_4_bunkers() { // these x's, y's can be changed later
-    // initialize bunkers
+
+void init_4_bunkers() { 
     for (int i = 0; i < BUNKER_COUNT; i++) {
         bunkers.bunkerArray[i].id = i;
         bunkers.bunkerArray[i].hp = BUNKER_FULL_HEALTH;
-        bunkers.bunkerArray[i].x = 10 + 30 * i;
+        bunkers.bunkerArray[i].x = 30 + 50 * i;
         bunkers.bunkerArray[i].y = 65;
         //bunkers.bunkerArray[i].nextBunkerStage. = bunker_dead;//bunker_lightly_damaged;
         //bunkers.bunkerArray[i].cleanBunker = bunker_clean;
@@ -64,17 +55,6 @@ uint8_t bunker_coll(Sprite *shot) {
 void update_bunker(uint8_t bunkerId) {//, Sprite sprite) {
     damage_bunker(&bunkers.bunkerArray[bunkerId]);
     redraw_bunker(&(bunkers.bunkerArray[bunkerId].nextBunkerStage));
-}
-
-void prepDraw() {
-    lcddev.select(1);
-    LCD_SetWindow(BUNKER_WINDOW_TOP_X, BUNKER_WINDOW_TOP_Y, BUNKER_WINDOW_BOTTOM_X, BUNKER_WINDOW_BOTTOM_Y);
-    LCD_WriteData16_Prepare();
-}
-
-void endDraw() {
-    LCD_WriteData16_End();
-    lcddev.select(0);
 }
 
 void redraw_bunker(Sprite *nextBunker) {
