@@ -7,6 +7,9 @@
 #include "timer.h"
 #include "string.h"
 #include "stm32f0xx.h"
+//#include <stdlib.h>
+//#include <stdlib.h>
+//#include <time.h>
 
 #define SHOT_SPEED 5
 
@@ -114,6 +117,20 @@ int main(void) {
             teleport_sprite(1000, 1000, &shot);
             score += 1;
         }
+
+
+        //time_t t;
+
+
+        //srand((unsigned) time(&t));
+
+
+        //for( i = 0 ; i < n ; i++ ) {
+        //   printf("%d\n", rand() % 50);
+        //}
+
+        //Sprite shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0 + 1)) + 0];
+
 	}
 
 	// -----60FPS (VERY COSTLY)-----
