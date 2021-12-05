@@ -158,9 +158,14 @@ void update_invaders() {
     // Go through a row
     for (uint16_t glob_x = hull.x1; glob_x <= hull.x2; glob_x++) {
       if (contains(glob_x, glob_y, new)) {
-        uint16_t *cur_data = invader_army.units[0].sprite_data;
+        uint16_t army_idx = army_x + army_y * INVADERS_WIDTH;
+        if (army_idx >= INVADERS_WIDTH * INVADERS_HEIGHT) {
+          army_idx = INVADERS_WIDTH * INVADERS_HEIGHT - 1;
+        }
+        uint16_t *cur_data = invader_army.units[army_idx].sprite_data;
         if (cur_data) {
-          LCD_WriteData16(cur_data[sprite_x + sprite_y * invader1_a_width]);
+          uint16_t data = cur_data[sprite_x + sprite_y * invader1_a_width];
+          LCD_WriteData16(data);
         } else {
           LCD_WriteData16(0x0);
         }
