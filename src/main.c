@@ -124,22 +124,23 @@ int main(void) {
 			if(shooter.sprite_data != NULL) {
 				if (bolts[i].bbox.x1 == 1000) {
 					teleport_sprite((int)((shooter.bbox.x2 + shooter.bbox.x1) / 2), shooter.bbox.y1 - 10, &bolts[i]);
-				} else if (bolts[i].bbox.x1 != 1000) {
-					move_sprite(&bolts[i], 0, -5, 0);
-				}
-				if (bolts[i].bbox.y2 <= 25) {
-					teleport_sprite(1000, 1000, &bolts[i]);
-				}
-
-				// Collision test
-				if (sprite_coll(&bolts[i], &bunker)) {
-					teleport_sprite(1000, 1000, &bolts[i]);
-				}
-				if (sprite_coll(&bolts[i], &player)) {
-					teleport_sprite(1000, 1000, &bolts[i]);
-					lives--;
 				}
 			}
+			if (bolts[i].bbox.x1 != 1000) {
+                move_sprite(&bolts[i], 0, -5, 0);
+            }
+            if (bolts[i].bbox.y2 <= 25) {
+                teleport_sprite(1000, 1000, &bolts[i]);
+            }
+
+            // Collision test
+            if (sprite_coll(&bolts[i], &bunker)) {
+                teleport_sprite(1000, 1000, &bolts[i]);
+            }
+            if (sprite_coll(&bolts[i], &player)) {
+                teleport_sprite(1000, 1000, &bolts[i]);
+                lives--;
+            }
         }
 
 	}
