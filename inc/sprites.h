@@ -33,7 +33,7 @@ int sprite_coll(Sprite *s1, Sprite *s2);
 
 void teleport_sprite(uint16_t x, uint16_t y, Sprite *s);
 
-Sprite* invader_coll(Sprite *s);
+
 
 // Clears the space where the sprite is
 void clear_sprite(Sprite *s);

@@ -122,7 +122,8 @@ void update_invaders() {
     new.x2 = old.x2 + invader_army.step;
     new.y1 = old.y1;
     new.y2 = old.y2;
-  }  compute_hull(old, new, &hull);
+  }
+  compute_hull(old, new, &hull);
   invader_army.bbox = new;
 
   // Start the draw call
@@ -172,4 +173,8 @@ void update_invaders() {
   //// Close down the communication with the lcd
   LCD_WriteData16_End();
   lcddev.select(0);
+}
+
+uint8_t invader_coll(Sprite *s) {
+
 }

@@ -68,7 +68,7 @@ int main(void) {
   Sprite shot;
   Sprite bunker;
 //  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
-  init_sprite(120,25,tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
+  init_sprite(120, 25, tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
   init_sprite(1000,1000,tank_shot_width, tank_shot_height, (uint16_t*)tank_shot, (uint16_t*)tank_shot, &shot);
   init_sprite(100,100,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker);
   // Initialize the invader army
@@ -137,5 +137,9 @@ int main(void) {
 
     while((glbcnt + 1) % 1 != 0);
     asm volatile("wfi" ::);
+  }
+
+  for(;;){
+    // For ending
   }
 }
