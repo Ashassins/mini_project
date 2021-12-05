@@ -7,11 +7,11 @@ InvaderArmy invader_army;
 int _n_units = sizeof(invader_army.units) / sizeof(invader_army.units[0]);
 
 // Initialize the invader state
-void init_invaders() {
-  invader_army.bbox.x1 = 20;
-  invader_army.bbox.y1 = 230;
-  invader_army.drop = 5;
-  invader_army.step = 2;
+void init_invaders(uint16_t start_x, uint16_t start_y, uint16_t drop, uint16_t step) {
+  invader_army.bbox.x1 = start_x;
+  invader_army.bbox.y1 = start_y;
+  invader_army.drop = drop;
+  invader_army.step = step;
   // The number of pixels we need to draw the invaders, accounting for the 2 px
   // between rows
   invader_army.bbox.x2 =

@@ -69,7 +69,7 @@ int main(void) {
   srand(1);
 
   // Initialize the invader army
-  init_invaders();
+  init_invaders(0, 230, 5, 2);
   // Init i2c and nunchuk
   //
 //  uint16_t mov_x = 5, mov_y = 5;
