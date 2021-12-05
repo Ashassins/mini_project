@@ -18,16 +18,6 @@
 int score = 0;
 int lives = 3;
 int all_dead = 0;
-// TODO This should be replaced with global tick, maybe use SysTick and check it
-// rather than busy looping
-static inline void nano_wait(unsigned int n) {
-  asm("        mov r0,%0\n"
-      "repeat: sub r0,#83\n"
-      "        bgt repeat\n"
-      :
-      : "r"(n)
-      : "r0", "cc");
-}
 
 void print_glbcnt(int x, int y) {
 	int toggle = 0;
