@@ -117,11 +117,19 @@ void update_invaders() {
     invader_army.step = -invader_army.step;
     new.y1 = old.y1 - invader_army.drop;
     new.y2 = old.y2 - invader_army.drop;
+    for(int i = 0; i < _n_units; i++) {
+      invader_army.units[i].bbox.y1 -= invader_army.drop;
+      invader_army.units[i].bbox.y2 -= invader_army.drop;
+    }
   } else {
     new.x1 = old.x1 + invader_army.step;
     new.x2 = old.x2 + invader_army.step;
     new.y1 = old.y1;
     new.y2 = old.y2;
+    for(int i = 0 ;i < _n_units; i++) {
+      invader_army.units[i].bbox.x1 += invader_army.step;
+      invader_army.units[i].bbox.x2 += invader_army.step;
+    }
   }
   compute_hull(old, new, &hull);
   invader_army.bbox = new;
