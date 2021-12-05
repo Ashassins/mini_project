@@ -15,6 +15,7 @@
 #define LIGHTNING_SPEED 5
 #define LIGHTNING_CNT 5
 
+int start = 0;
 int score = 0;
 int lives = 3; // Cannot be more than 9 for now
 int all_dead = 0;
@@ -69,6 +70,15 @@ int main(void) {
   // Init i2c and nunchuk
   //
 //  uint16_t mov_x = 5, mov_y = 5;
+  LCD_DrawString(165,250,0x0F00,0x0000, "SPACE INVADERS", 16, 0);
+  LCD_DrawString(180,200,0x0F00,0x0000, "PRESS (C) TO START!", 16, 0);
+  while (!(start)) {
+      if (flg_c) {
+          start = 1;
+      }
+  }
+  LCD_DrawString(165,250,0x0F00,0x0000, "              ", 16, 0);
+  LCD_DrawString(180,200,0x0F00,0x0000, "                   ", 16, 0);
   while (!(all_dead) && lives > 0 && !(inv_comp)) {
     if ((glbcnt + 1) % 15 == 0) {
     	// -----4FPS (BASICALLY FREE)-----
@@ -91,7 +101,7 @@ int main(void) {
 
     if ((glbcnt + 1) % 4 == 0) {
       // -----15FPS-----
-      print_flags(175, 1);
+//      print_flags(175, 1);
       //        print_glbcnt(230,1);
     }
 
