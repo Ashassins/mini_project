@@ -12,6 +12,7 @@
 #include <time.h>
 
 #define SHOT_SPEED 10
+#define BOLT_SPEED -5
 
 int score = 0;
 int lives = 3;
@@ -41,7 +42,6 @@ void draw_score(int x, int y) {
 }
 
 int main(void) {
-  init_nunchuk();
   init_tim6();
   setup_music();
   start_music();
@@ -125,7 +125,7 @@ int main(void) {
 				}
 			}
 			if (bolts[i].bbox.x1 != 1000) {
-                move_sprite(&bolts[i], 0, -5, 0);
+                move_sprite(&bolts[i], 0, BOLT_SPEED, 0);
             }
             if (bolts[i].bbox.y2 <= 25) {
                 teleport_sprite(1000, 1000, &bolts[i]);
