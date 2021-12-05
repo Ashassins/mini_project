@@ -12,9 +12,11 @@
 #include <time.h>
 
 #define SHOT_SPEED 10
+#define LIGHTNING_SPEED 5
+#define LIGHTNING_CNT 5
 
 int score = 0;
-int lives = 3;
+int lives = 3; // Cannot be more than 9 for now
 int all_dead = 0;
 // TODO This should be replaced with global tick, maybe use SysTick and check it
 // rather than busy looping
@@ -37,6 +39,9 @@ void print_glbcnt(int x, int y) {
 void draw_score(int x, int y) {
     char output[10] = "SCORE:   ";
     itoa(score, &output[6], 10);
+    char output_2[11] = " LIVES:   ";
+    itoa(lives, &output_2[7], 10);
+    strcat(output, output_2);
     LCD_DrawString(x,y,0xFFFF,0x0000, output, 16, 0);
 }
 
@@ -55,9 +60,9 @@ int main(void) {
   init_sprite(120, 25, tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
   init_sprite(1000,1000,tank_shot_width, tank_shot_height, (uint16_t*)tank_shot, (uint16_t*)tank_shot, &shot);
   // setup five bolts
-  Sprite bolts[5];
-  for(int i = 0; i < 5; i++) {
-	  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &bolts[i]);
+  Sprite bolts[LIGHTNING_CNT];
+  for(int i = 0; i < LIGHTNING_CNT; i++) {
+	  init_sprite(1000,1000,lightning_a_width, lightning_a_height, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &bolts[i]);
   }
 
   // Setup randomness
@@ -68,14 +73,18 @@ int main(void) {
   // Init i2c and nunchuk
   //
 //  uint16_t mov_x = 5, mov_y = 5;
-  while (!(all_dead)) {
+  while (!(all_dead) && lives > 0) {
     if ((glbcnt + 1) % 15 == 0) {
     	// -----4FPS (BASICALLY FREE)-----
 //    	LCD_DrawString(230,300,0x0F00,0x0000, "Don't mind the spaz monke uwu", 16, 0);
-    	draw_score(140,300);
+    	draw_score(170,300);
         // Change ("animate") the test sprite
     	player.sprite_data =
             (uint16_t *)(((uint32_t)player.sprite_data) ^ player.sprite_swap_key);
+    	for(int i = 0; i < LIGHTNING_CNT; i++) {
+    	    bolts[i].sprite_data =
+    	            (uint16_t *)(((uint32_t)bolts[i].sprite_data) ^ bolts[i].sprite_swap_key);
+    	}
 //    	invader.sprite_data =
 //            (uint16_t *)(((uint32_t)invader.sprite_data) ^ invader.sprite_swap_key);
     	// Draw the invading army
@@ -117,7 +126,7 @@ int main(void) {
 
 
         Sprite shooter;
-        for(int i = 0; i < 5; i++) {
+        for(int i = 0; i < LIGHTNING_CNT; i++) {
 			shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0)) + 0];
 			if(shooter.sprite_data != NULL) {
 				if (bolts[i].bbox.x1 == 1000) {
@@ -125,7 +134,7 @@ int main(void) {
 				}
 			}
 			if (bolts[i].bbox.x1 != 1000) {
-                move_sprite(&bolts[i], 0, -5, 0);
+                move_sprite(&bolts[i], 0, -LIGHTNING_SPEED, 0);
             }
             if (bolts[i].bbox.y2 <= 25) {
                 teleport_sprite(1000, 1000, &bolts[i]);
@@ -165,6 +174,10 @@ int main(void) {
 
   for(;;){
     // For ending
+      draw_score(170,300);
+      if (lives == 0) {
+          LCD_DrawString(180,200,0xF000,0x0000, "GAME OVER YOU LOSE!", 16, 0);
+      }
       if (all_dead) {
           LCD_DrawString(180,200,0x0F00,0x0000, "GAME OVER YOU WON!", 16, 0);
       }
