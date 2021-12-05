@@ -120,7 +120,7 @@ int main(void) {
 
         Sprite shooter;
         for(int i = 0; i < 5; i++) {
-			shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0 + 1)) + 0];
+			shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0)) + 0];
 			if(shooter.sprite_data != NULL) {
 				if (bolts[i].bbox.x1 == 1000) {
 					teleport_sprite((int)((shooter.bbox.x2 + shooter.bbox.x1) / 2), shooter.bbox.y1 - 10, &bolts[i]);
