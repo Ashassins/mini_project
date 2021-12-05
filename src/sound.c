@@ -7,7 +7,6 @@ void init_tim16();
 void init_sound_dma();
 
 uint16_t melody_idx;
-uint8_t melody_select;
 uint16_t nxt_note, nxt_dur;
 /*
  * Invokes setup procedures for music module
@@ -27,7 +26,6 @@ void setup_music() {
 void start_music() {
   // Reset all of the global vars and enable the timers and dma
   melody_idx = 0;
-  melody_select = 0;
   DAC->CR |= DAC_CR_EN1;
   DMA1_Channel2->CCR |= DMA_CCR_EN;
   TIM2->CR1 |= TIM_CR1_CEN;
@@ -129,43 +127,16 @@ void TIM16_IRQHandler() {
   // Status led for lazy debug
   GPIOC->BSRR = GPIO_BSRR_BR_9 | (GPIO_BSRR_BS_9 & ~(GPIOC->ODR));
 
-  melody_idx += 1; 
+  melody_idx += 1;
   if (melody_idx > full_melody_len) {
       melody_idx = 0;
-      //melody_select = 2;
-  } 
+  }
   if (melody_idx == 0) {
     nxt_note = full_melody[melody_idx];
   } else {
     nxt_note = full_melody[melody_idx-1];
   }
   nxt_dur = full_durations[melody_idx];
-
-  // Select which note, from which melody to play from
-  /*
-  if (melody_select == 2) {
-    if (melody_idx >= melody2_len) {
-      melody_idx = 0;
-      melody_select = 0;
-      nxt_note = melody1[melody_idx];
-      nxt_dur = noteDurations1[melody_idx];
-    } else {
-      nxt_note = melody2[melody_idx];
-      nxt_dur = noteDurations2[melody_idx];
-    }
-  } else {
-    if (melody_idx >= melody1_len) {
-      melody_idx = 0;
-      melody_select++;
-    }
-    if (melody_select == 2) {
-      nxt_note = melody2[melody_idx];
-      nxt_dur = noteDurations2[melody_idx];
-    } else {
-      nxt_note = melody1[melody_idx];
-      nxt_dur = noteDurations1[melody_idx];
-    }
-  }//*/
 
   // Needed to make sure we don't set the arr to zero on accident for a rest
   // note
@@ -183,39 +154,17 @@ void TIM16_IRQHandler() {
 }
 
 const uint16_t wavetable[SAMPLES] = {
-    96,   252,  408,  564,  720,  876,  1032, 1189, 1345, 1501,
-    1657, 1813, 1969, 2126, 2282, 2438, 2594, 2750, 2906, 3063,
-    3219, 3375, 3531, 3687, 3843, 4000, 3843, 3687, 3531, 3375,
-    3219, 3063, 2906, 2750, 2594, 2438, 2282, 2126, 1969, 1813,
-    1657, 1501, 1345, 1189, 1032, 876,  720,  564,  408,  252,
+        96, 174, 252, 330, 408, 486, 564, 642, 720, 798,
+        876, 954, 1032, 1111, 1189, 1267, 1345, 1423, 1501, 1579,
+        1657, 1735, 1813, 1891, 1969, 2048, 2126, 2204, 2282, 2360,
+        2438, 2516, 2594, 2672, 2750, 2828, 2906, 2984, 3063, 3141,
+        3219, 3297, 3375, 3453, 3531, 3609, 3687, 3765, 3843, 3921,
+        4000, 3921, 3843, 3765, 3687, 3609, 3531, 3453, 3375, 3297,
+        3219, 3141, 3063, 2984, 2906, 2828, 2750, 2672, 2594, 2516,
+        2438, 2360, 2282, 2204, 2126, 2048, 1969, 1891, 1813, 1735,
+        1657, 1579, 1501, 1423, 1345, 1267, 1189, 1111, 1032, 954,
+        876, 798, 720, 642, 564, 486, 408, 330, 252, 174,
 };
-
-const uint16_t melody1[] = {// 19
-    NOTE_E5,    NOTE_B4,    NOTE_C5,      NOTE_D5,
-    NOTE_C5,    NOTE_B4,    NOTE_A4,      NOTE_A4,
-    NOTE_C5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
-    NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
-    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ REST, // 19
-    NOTE_D5,    NOTE_F5,    NOTE_A5,      NOTE_G5,
-    NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
-    NOTE_D5,    NOTE_C5,    NOTE_B4,      NOTE_B4,
-    NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_C5,
-    NOTE_A4,    NOTE_A4,/**/NOTE_E5,      NOTE_B4, // 21
-    NOTE_C5,    NOTE_D5,    NOTE_E5,      NOTE_D5,
-    NOTE_C5,    NOTE_B4,    NOTE_A4,      NOTE_A4};
-const uint16_t melody2[] = {
-    NOTE_C5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
-    NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
-    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ REST,   // 20
-    NOTE_D5,    NOTE_F5,    NOTE_A5,      NOTE_G5,
-    NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
-    NOTE_F5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
-    NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
-    NOTE_C5,    NOTE_A4,    NOTE_A4, /**/ NOTE_E5, // 8
-    NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
-    NOTE_A4,    NOTE_GS4,   NOTE_B4, /**/ NOTE_E5, //9
-    NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
-    NOTE_E5,    NOTE_A5,    NOTE_A5,      NOTE_GS5/**/};
 
 const uint16_t full_melody[] = {// 19
     NOTE_E5,    NOTE_B4,    NOTE_C5,      NOTE_D5,
@@ -243,7 +192,7 @@ const uint16_t full_melody[] = {// 19
     NOTE_F5,    NOTE_E5,    NOTE_C5,      NOTE_E5,
     NOTE_F5,    NOTE_E5,    NOTE_D5,      NOTE_C5,
     NOTE_B4,    NOTE_C5,    NOTE_D5,      NOTE_E5,
-    NOTE_C5,    NOTE_A4,    REST, 
+    NOTE_C5,    NOTE_A4,    REST,
     NOTE_A4, /**/ NOTE_E5, // 8
     NOTE_C5,    NOTE_D5,    NOTE_B4,      NOTE_C5,
     NOTE_A4,    NOTE_GS4,   NOTE_B4, /**/ NOTE_E5, //9
@@ -252,35 +201,6 @@ const uint16_t full_melody[] = {// 19
     NOTE_A5,    NOTE_GS5,   REST/**/};
 
 
-// 19 19 21 20 8 9
-const uint16_t noteDurations1[] = {
-    QUARTER_NOTE,   EIGHTH_NOTE,    EIGHTH_NOTE,      QUARTER_NOTE,
-    EIGHTH_NOTE,    EIGHTH_NOTE,    QUARTER_NOTE,     EIGHTH_NOTE,
-    EIGHTH_NOTE,    QUARTER_NOTE,   EIGHTH_NOTE,      EIGHTH_NOTE,
-    DOT_QUART_NOTE, EIGHTH_NOTE,    QUARTER_NOTE,     QUARTER_NOTE,
-    QUARTER_NOTE,   QUARTER_NOTE,   HALF_NOTE, /**/   EIGHTH_NOTE,
-    QUARTER_NOTE,   EIGHTH_NOTE,    QUARTER_NOTE,     EIGHTH_NOTE,
-    EIGHTH_NOTE,    DOT_QUART_NOTE, EIGHTH_NOTE,      QUARTER_NOTE,
-    EIGHTH_NOTE,    EIGHTH_NOTE,    QUARTER_NOTE,     EIGHTH_NOTE,
-    EIGHTH_NOTE,    QUARTER_NOTE,   QUARTER_NOTE,     QUARTER_NOTE,
-    QUARTER_NOTE,   HALF_NOTE, /**/ QUARTER_NOTE,     EIGHTH_NOTE,
-    EIGHTH_NOTE,    EIGHTH_NOTE,    SIXTEENTH_NOTE,   SIXTEENTH_NOTE,
-    EIGHTH_NOTE,    EIGHTH_NOTE,    QUARTER_NOTE,     EIGHTH_NOTE};
-
-const uint16_t noteDurations2[] = {
-    EIGHTH_NOTE,    QUARTER_NOTE,   EIGHTH_NOTE,      EIGHTH_NOTE,
-    DOT_QUART_NOTE, EIGHTH_NOTE,    QUARTER_NOTE,     QUARTER_NOTE,
-    QUARTER_NOTE,   QUARTER_NOTE,   HALF_NOTE, /**/   EIGHTH_NOTE,
-    QUARTER_NOTE,   EIGHTH_NOTE,    QUARTER_NOTE,     EIGHTH_NOTE,
-    EIGHTH_NOTE,    DOT_QUART_NOTE, EIGHTH_NOTE,      EIGHTH_NOTE,
-    SIXTEENTH_NOTE, SIXTEENTH_NOTE, EIGHTH_NOTE,      EIGHTH_NOTE,
-    DOT_QUART_NOTE, EIGHTH_NOTE,    QUARTER_NOTE,     QUARTER_NOTE,
-    QUARTER_NOTE,   QUARTER_NOTE,   HALF_NOTE, /**/   HALF_NOTE,
-    HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        HALF_NOTE,
-    HALF_NOTE,      HALF_NOTE,      HALF_NOTE, /**/   HALF_NOTE,
-    HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        QUARTER_NOTE,
-    QUARTER_NOTE,   QUARTER_NOTE,   QUARTER_NOTE,     WHOLE_NOTE/**/};
-
 const uint16_t full_durations[] = {
   QUARTER_NOTE,   EIGHTH_NOTE,    EIGHTH_NOTE,      QUARTER_NOTE,
   EIGHTH_NOTE,    EIGHTH_NOTE,    QUARTER_NOTE,     TOUNGED,
@@ -288,7 +208,7 @@ const uint16_t full_durations[] = {
   EIGHTH_NOTE,    QUARTER_NOTE,   EIGHTH_NOTE,      EIGHTH_NOTE,
   DOT_QUART_NOTE, EIGHTH_NOTE,    QUARTER_NOTE,     QUARTER_NOTE,
   QUARTER_NOTE,   QUARTER_NOTE,   TOUNGED,
-  HALF_NOTE, /**/   EIGHTH_NOTE,  
+  HALF_NOTE, /**/   EIGHTH_NOTE,
   QUARTER_NOTE,   EIGHTH_NOTE,    QUARTER_NOTE,     EIGHTH_NOTE,
   EIGHTH_NOTE,    DOT_QUART_NOTE, EIGHTH_NOTE,      QUARTER_NOTE,
   EIGHTH_NOTE,    EIGHTH_NOTE,    QUARTER_NOTE,     TOUNGED,
@@ -315,6 +235,4 @@ const uint16_t full_durations[] = {
   QUARTER_NOTE,   QUARTER_NOTE,   TOUNGED,
   QUARTER_NOTE,    WHOLE_NOTE,     EIGHTH_NOTE/**/};
 
-const uint16_t melody1_len = sizeof(melody1) / sizeof(melody1[0]);
-const uint16_t melody2_len = sizeof(melody2) / sizeof(melody2[0]);
 const uint16_t full_melody_len = sizeof(full_melody) / sizeof(full_melody[0]);

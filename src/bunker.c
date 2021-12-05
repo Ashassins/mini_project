@@ -13,7 +13,7 @@ Bunker bunker;
 BunkerArray bunkers;
 Sprite clean_bunker;
 
-/*
+
 Sprite bunker1;
 Sprite bunker2;
 Sprite bunker3;
@@ -22,10 +22,14 @@ Sprite bunker4;
 int _n_bunkers = sizeof(bunkers.bunkerArray) / sizeof(bunkers.cleanBunker);
 // this needs to be a clean bunker
 void init_4_bunkers() { // these x's, y's can be changed later
-    init_sprite(10,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &clean_bunker);
-    init_sprite(30,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &clean_bunker);
-    init_sprite(50,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &clean_bunker);
-    init_sprite(70,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &clean_bunker);
+    init_sprite(10,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker1);
+    init_sprite(30,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker2);
+    init_sprite(50,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker3);
+    init_sprite(70,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker4);
+    draw_sprite(&bunker1);
+    draw_sprite(&bunker2);
+    draw_sprite(&bunker3);
+    draw_sprite(&bunker4);
 }
 
 void damage_bunker(Bunker bunker) {
@@ -71,5 +75,14 @@ void redraw_bunker(uint8_t bunkerId, Sprite *nextBunker) {
     endDraw();
 }
 
+uint8_t bunker_coll(Sprite *shot) {
+    for (int i = 0; i < BUNKER_COUNT; i++) {
+        if (sprite_coll(shot, &(bunkers.bunkerArray[i])) && bunkers.bunkerArray[i].hp != 0) {
+            //damage_bunker();
+            return 1;
+        }
+    }
+    return 0;
+}
 
 
