@@ -40,7 +40,7 @@ void draw_score(int x, int y) {
 }
 
 int main(void) {
-  //init_nunchuk();
+  init_nunchuk();
   init_tim6();
   setup_music();
   start_music();
@@ -65,7 +65,7 @@ int main(void) {
   srand(1);
 
   // Initialize the invader army
-  init_invaders();
+  init_invaders(0, 230, 5, 2);
   // Init i2c and nunchuk
   //
 //  uint16_t mov_x = 5, mov_y = 5;
@@ -112,7 +112,7 @@ int main(void) {
         }
 
         // Collision test
-        if (sprite_coll(&shot, &bunker)) {
+        if (invader_coll(&shot)) {
             teleport_sprite(1000, 1000, &shot);
             score += 1;
         }

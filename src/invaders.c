@@ -4,14 +4,18 @@
 #include "util.h"
 
 InvaderArmy invader_army;
+// This is the number of units in the army
 int _n_units = sizeof(invader_army.units) / sizeof(invader_army.units[0]);
 
-// Initialize the invader state
-void init_invaders() {
-  invader_army.bbox.x1 = 20;
-  invader_army.bbox.y1 = 230;
-  invader_army.drop = 5;
-  invader_army.step = 2;
+/* Initialize the invader state
+ * Sets the starting x, y coordinates for the invaders, as well as the drop and step for each of their ticks
+*/
+void init_invaders(uint16_t start_x, uint16_t start_y, uint16_t drop, uint16_t step) {
+  // Set the inital movement and bounding box location
+  invader_army.bbox.x1 = start_x;
+  invader_army.bbox.y1 = start_y;
+  invader_army.drop = drop;
+  invader_army.step = step;
   // The number of pixels we need to draw the invaders, accounting for the 2 px
   // between rows
   invader_army.bbox.x2 =
@@ -20,6 +24,7 @@ void init_invaders() {
                          INVADERS_HEIGHT * invader1_a_height +
                          (INVADERS_HEIGHT * 2) - 1;
 
+  // Initialize each invader's sprite
   uint16_t *sprite_a;
   uint16_t *sprite_b;
   for (int y = 0; y < INVADERS_HEIGHT; y++) {
@@ -43,75 +48,41 @@ void init_invaders() {
   }
 }
 
-/*
- * This function will most likely not get used,
- * however the core logic will most likely be useful for drawing the invaders
- * each frame as they move NOTE things get completly screwed if any of the
- * invaders have a different size
- */
+// Draw the invaders in place
 void draw_invaders() {
-  // Start the draw call
-  lcddev.select(1);
-  LCD_SetWindow(invader_army.bbox.x1, invader_army.bbox.y1,
-                invader_army.bbox.x2, invader_army.bbox.y2);
-  LCD_WriteData16_Prepare();
+  // Save the movement for the invaders
+  uint16_t drop = invader_army.drop;
+  uint16_t step = invader_army.step;
+  invader_army.drop = 0;
+  invader_army.step = 0;
+  // Call move with no change in position
+  move_invaders();
+  // Put things back
+  invader_army.drop = drop;
+  invader_army.step = step;
 
-  // Draw the army
-  uint16_t sprite_x = 0, sprite_y = 0;
-  uint16_t army_x = 0, army_y = 0;
-  // Loop bounds
-  uint16_t start_y = invader_army.bbox.y1;
-  uint16_t end_y = invader_army.bbox.y2;
-  uint16_t start_x = invader_army.bbox.x1;
-  uint16_t end_x = invader_army.bbox.x2;
-
-  for (uint16_t glob_y = start_y; glob_y <= end_y; glob_y++) {
-    // Do we need to draw between the rows
-    if (sprite_y >= invader1_a_height) {
-      // Draw some spacing between the rows
-      glob_y += 2;
-      for (int i = 0; i < (end_x - start_x + 1) * 2; i++) {
-        LCD_WriteData16(0x0);
-      }
-      // Reset the sprite veritcal
-      sprite_y = 0;
-      army_y += 1;
-    }
-    // Go through a row
-    for (uint16_t glob_x = start_x; glob_x <= end_x; glob_x++) {
-      uint16_t *cur_data = invader_army.units[army_x + army_y * INVADERS_WIDTH].sprite_data;
-      if (cur_data) {
-        LCD_WriteData16(cur_data[sprite_x + sprite_y * invader1_a_width]);
-      } else {
-        LCD_WriteData16(0x0);
-      }
-      sprite_x++;
-      if (sprite_x >= invader1_a_width) {
-        sprite_x = 0;
-        army_x++;
-      }
-    }
-    army_x = 0;
-    sprite_y++;
-    sprite_x = 0;
-  }
-  // Close down the communication with the lcd
-  LCD_WriteData16_End();
-  lcddev.select(0);
 }
 
+// Update the invader visual and move them
 void update_invaders() {
-  InvaderArmy ia = invader_army;
   for (int i = 0; i < _n_units; i++) {
     // Swap each sprite pointer
     invader_army.units[i].sprite_data =
         (uint16_t *)(((uint32_t)invader_army.units[i].sprite_data) ^
                      invader_army.units[i].sprite_swap_key);
   }
+  // Move the invaders
+  move_invaders();
+}
+
+// Move the invaders along their zig-zag pattern
+void move_invaders(){
+
   Rect hull, old, new;
   old = invader_army.bbox;
   new = invader_army.bbox;
   uint16_t new_left = old.x2 + invader_army.step;
+  // Move the army
   if(new_left >= LCD_W || old.x1 + invader_army.step < 0) {
     invader_army.step = -invader_army.step;
     new.y1 = old.y1 - invader_army.drop;
@@ -130,6 +101,7 @@ void update_invaders() {
       invader_army.units[i].bbox.x2 += invader_army.step;
     }
   }
+  // Compute the full area to draw
   compute_hull(old, new, &hull);
   invader_army.bbox = new;
 
@@ -138,7 +110,7 @@ void update_invaders() {
   LCD_SetWindow(hull.x1, hull.y1, hull.x2, hull.y2);
   LCD_WriteData16_Prepare();
 
-  // Draw the army
+  // For tracking the drawing
   uint16_t sprite_x = 0, sprite_y = 0;
   uint16_t army_x = 0, army_y = 0;
 
@@ -157,36 +129,53 @@ void update_invaders() {
     }
     // Go through a row
     for (uint16_t glob_x = hull.x1; glob_x <= hull.x2; glob_x++) {
+      // If the pixel we're at is in side of our bounding box, do we want to draw it?
       if (contains(glob_x, glob_y, new)) {
+        // Compute which invader we're drawing currently
         uint16_t army_idx = army_x + army_y * INVADERS_WIDTH;
+        // Make sure we don't try to draw something that doesn't exist
         if (army_idx >= INVADERS_WIDTH * INVADERS_HEIGHT) {
           army_idx = INVADERS_WIDTH * INVADERS_HEIGHT - 1;
         }
+        // Get the sprite of our current invader
         uint16_t *cur_data = invader_army.units[army_idx].sprite_data;
         if (cur_data) {
+          // Draw the invader if it's alive
           uint16_t data = cur_data[sprite_x + sprite_y * invader1_a_width];
           LCD_WriteData16(data);
         } else {
+          // Fill with black otherwise
           LCD_WriteData16(0x0);
         }
+        // Move along
         sprite_x++;
         if (sprite_x >= invader1_a_width) {
           sprite_x = 0;
           army_x++;
         }
-      } else {
+      } else { // Draw over where we were
         LCD_WriteData16(0x0);
       }
     }
+    // Move along
     army_x = 0;
     sprite_y++;
     sprite_x = 0;
   }
-  //// Close down the communication with the lcd
+  // Close down the communication with the lcd
   LCD_WriteData16_End();
   lcddev.select(0);
+
 }
 
-uint8_t invader_coll(Sprite *s) {
-
+uint8_t invader_coll(Sprite *shot) {
+    for (int i = 0; i < INVADERS_COUNT; i++) {
+        if (sprite_coll(shot, &(invader_army.units[i])) && invader_army.units[i].sprite_data != NULL) {
+            invader_army.units[i].sprite_data = NULL;
+            invader_army.units[i].sprite_swap_key = 0;
+            clear_sprite(&invader_army.units[i]);
+            return 1;
+        }
+    }
+    return 0;
 }
