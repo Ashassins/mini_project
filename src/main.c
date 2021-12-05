@@ -39,7 +39,7 @@ void draw_score(int x, int y) {
 }
 
 int main(void) {
-  //init_nunchuk();
+  init_nunchuk();
   init_tim6();
   setup_music();
   start_music();
@@ -116,7 +116,7 @@ int main(void) {
         }
 
         // Collision test
-        if (sprite_coll(&shot, &bunker)) {
+        if (invader_coll(&shot)) {
             teleport_sprite(1000, 1000, &shot);
             score += 1;
         }
