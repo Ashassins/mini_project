@@ -78,7 +78,7 @@ void redraw_bunker(uint8_t bunkerId, Sprite *nextBunker) {
 uint8_t bunker_coll(Sprite *shot) {
     for (int i = 0; i < BUNKER_COUNT; i++) {
         if (sprite_coll(shot, &(bunkers.bunkerArray[i])) && bunkers.bunkerArray[i].hp != 0) {
-            damage_bunker();
+            //damage_bunker();
             return 1;
         }
     }
