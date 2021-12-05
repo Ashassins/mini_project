@@ -1,7 +1,7 @@
 #ifndef NOTES_H
 #define NOTES_H
 
-#define SAMPLES 50
+#define SAMPLES 100
 
 #define BPM 140
 
