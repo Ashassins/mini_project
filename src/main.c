@@ -7,9 +7,9 @@
 #include "timer.h"
 #include "string.h"
 #include "stm32f0xx.h"
-//#include <stdlib.h>
-//#include <stdlib.h>
-//#include <time.h>
+#include <stdlib.h>
+#include <stdlib.h>
+#include <time.h>
 
 #define SHOT_SPEED 5
 
@@ -65,6 +65,9 @@ int main(void) {
   init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning4);
   init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning5);
 
+  // Setup randomness
+  srand(1);
+
   // Initialize the invader army
   init_invaders();
   // Init i2c and nunchuk
@@ -119,17 +122,20 @@ int main(void) {
         }
 
 
-        //time_t t;
+        Sprite shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0 + 1)) + 0];
+        if (lightning1.bbox.x1 == 1000) {
+        	teleport_sprite((int)((shooter.bbox.x2 + shooter.bbox.x1) / 2), shooter.bbox.y1 - 10, &lightning1);
+        } else if (lightning1.bbox.x1 != 1000) {
+            move_sprite(&lightning1, 0, -5, 0);
+        }
+        if (lightning1.bbox.y2 <= 25) {
+            teleport_sprite(1000, 1000, &lightning1);
+        }
 
-
-        //srand((unsigned) time(&t));
-
-
-        //for( i = 0 ; i < n ; i++ ) {
-        //   printf("%d\n", rand() % 50);
-        //}
-
-        //Sprite shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0 + 1)) + 0];
+        // Collision test
+        if (sprite_coll(&lightning1, &bunker)) {
+            teleport_sprite(1000, 1000, &lightning1);
+        }
 
 	}
 
