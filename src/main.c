@@ -11,10 +11,11 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define SHOT_SPEED 5
+#define SHOT_SPEED 10
 
 int score = 0;
 int lives = 3;
+int all_dead = 0;
 // TODO This should be replaced with global tick, maybe use SysTick and check it
 // rather than busy looping
 static inline void nano_wait(unsigned int n) {
@@ -67,7 +68,7 @@ int main(void) {
   // Init i2c and nunchuk
   //
 //  uint16_t mov_x = 5, mov_y = 5;
-  for (;;) {
+  while (!(all_dead)) {
     if ((glbcnt + 1) % 15 == 0) {
     	// -----4FPS (BASICALLY FREE)-----
 //    	LCD_DrawString(230,300,0x0F00,0x0000, "Don't mind the spaz monke uwu", 16, 0);
@@ -140,7 +141,12 @@ int main(void) {
                 lives--;
             }
         }
-
+        all_dead = 1;
+        for (int i = 0; i < INVADERS_COUNT; i++) {
+            if (invader_army.units[i].sprite_data != NULL) {
+                all_dead = 0;
+            }
+        }
 	}
 
 	// -----60FPS (VERY COSTLY)-----
@@ -159,5 +165,8 @@ int main(void) {
 
   for(;;){
     // For ending
+      if (all_dead) {
+          LCD_DrawString(180,200,0x0F00,0x0000, "GAME OVER YOU WON!", 16, 0);
+      }
   }
 }
