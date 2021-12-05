@@ -14,6 +14,7 @@
 #define SHOT_SPEED 5
 
 int score = 0;
+int lives = 3;
 // TODO This should be replaced with global tick, maybe use SysTick and check it
 // rather than busy looping
 static inline void nano_wait(unsigned int n) {
@@ -50,20 +51,15 @@ int main(void) {
   Sprite player;
   Sprite shot;
   Sprite bunker;
-  Sprite lightning1;
-  Sprite lightning2;
-  Sprite lightning3;
-  Sprite lightning4;
-  Sprite lightning5;
 //  init_sprite(40, 40, invader1_a_width, invader1_a_height, (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
   init_sprite(120, 25, tank_clean_width, tank_clean_height, (uint16_t*)tank_clean, (uint16_t*)tank_clean, &player);
   init_sprite(1000,1000,tank_shot_width, tank_shot_height, (uint16_t*)tank_shot, (uint16_t*)tank_shot, &shot);
   init_sprite(100,100,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker);
-  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning1);
-  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning2);
-  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning3);
-  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning4);
-  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning5);
+  // setup five bolts
+  Sprite bolts[5];
+  for(int i = 0; i < 5; i++) {
+	  init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &bolts[i]);
+  }
 
   // Setup randomness
   srand(1);
@@ -122,20 +118,27 @@ int main(void) {
         }
 
 
-        Sprite shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0 + 1)) + 0];
-        if(shooter.sprite_data != NULL) {
-			if (lightning1.bbox.x1 == 1000) {
-				teleport_sprite((int)((shooter.bbox.x2 + shooter.bbox.x1) / 2), shooter.bbox.y1 - 10, &lightning1);
-			} else if (lightning1.bbox.x1 != 1000) {
-				move_sprite(&lightning1, 0, -5, 0);
-			}
-			if (lightning1.bbox.y2 <= 25) {
-				teleport_sprite(1000, 1000, &lightning1);
-			}
+        Sprite shooter;
+        for(int i = 0; i < 5; i++) {
+			shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0 + 1)) + 0];
+			if(shooter.sprite_data != NULL) {
+				if (bolts[i].bbox.x1 == 1000) {
+					teleport_sprite((int)((shooter.bbox.x2 + shooter.bbox.x1) / 2), shooter.bbox.y1 - 10, &bolts[i]);
+				} else if (bolts[i].bbox.x1 != 1000) {
+					move_sprite(&bolts[i], 0, -5, 0);
+				}
+				if (bolts[i].bbox.y2 <= 25) {
+					teleport_sprite(1000, 1000, &bolts[i]);
+				}
 
-			// Collision test
-			if (sprite_coll(&lightning1, &bunker)) {
-				teleport_sprite(1000, 1000, &lightning1);
+				// Collision test
+				if (sprite_coll(&bolts[i], &bunker)) {
+					teleport_sprite(1000, 1000, &bolts[i]);
+				}
+				if (sprite_coll(&bolts[i], &player)) {
+					teleport_sprite(1000, 1000, &bolts[i]);
+					lives--;
+				}
 			}
         }
 
