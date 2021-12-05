@@ -168,6 +168,14 @@ void move_invaders(){
 
 }
 
-uint8_t invader_coll(Sprite *s) {
-
+uint8_t invader_coll(Sprite *shot) {
+    for (int i = 0; i < INVADERS_COUNT; i++) {
+        if (sprite_coll(shot, &(invader_army.units[i])) && invader_army.units[i].sprite_data != NULL) {
+            invader_army.units[i].sprite_data = NULL;
+            invader_army.units[i].sprite_swap_key = 0;
+            clear_sprite(&invader_army.units[i]);
+            return 1;
+        }
+    }
+    return 0;
 }
