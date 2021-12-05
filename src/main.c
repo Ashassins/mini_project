@@ -7,9 +7,9 @@
 #include "timer.h"
 #include "string.h"
 #include "stm32f0xx.h"
-#include <stdlib.h>
-#include <stdlib.h>
-#include <time.h>
+//#include <stdlib.h>
+//#include <stdlib.h>
+//#include <time.h>
 
 #define SHOT_SPEED 5
 
@@ -65,10 +65,6 @@ int main(void) {
   init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning4);
   init_sprite(1000,1000,lightning_a_width, lightning_b_width, (uint16_t*)lightning_a, (uint16_t*)lightning_b, &lightning5);
 
-  // Set up randmoness
-  time_t t;
-  srand((unsigned) time(&t));
-
   // Initialize the invader army
   init_invaders();
   // Init i2c and nunchuk
@@ -122,11 +118,18 @@ int main(void) {
             score += 1;
         }
 
+
+        //time_t t;
+
+
+        //srand((unsigned) time(&t));
+
+
         //for( i = 0 ; i < n ; i++ ) {
         //   printf("%d\n", rand() % 50);
         //}
 
-        Sprite shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0 + 1)) + 0];
+        //Sprite shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0 + 1)) + 0];
 
 	}
 
