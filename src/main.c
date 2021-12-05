@@ -16,7 +16,7 @@
 #define LIGHTNING_CNT 5
 
 int start = 0;
-int score = 0;
+//int score = 0;
 int lives = 3; // Cannot be more than 9 for now
 int all_dead = 0;
 int inv_comp = 0;
@@ -128,7 +128,6 @@ int main(void) {
       // Collision test
       if (invader_coll(&shot)) {
         teleport_sprite(1000, 1000, &shot);
-        score += 1;
       }
 
       if (bunker_coll(&shot)) {
