@@ -233,6 +233,6 @@ const uint16_t full_durations[] = {
   HALF_NOTE,      HALF_NOTE,      HALF_NOTE, /**/   HALF_NOTE,
   HALF_NOTE,      HALF_NOTE,      HALF_NOTE,        QUARTER_NOTE,
   QUARTER_NOTE,   QUARTER_NOTE,   TOUNGED,
-  QUARTER_NOTE,    WHOLE_NOTE,     EIGHTH_NOTE/**/};
+  QUARTER_NOTE,    WHOLE_NOTE,     SIXTEENTH_NOTE/**/};
 
 const uint16_t full_melody_len = sizeof(full_melody) / sizeof(full_melody[0]);

@@ -3,7 +3,7 @@
 
 #define SAMPLES 100
 
-#define BPM 140
+#define BPM 150
 
 #define WHOLE_NOTE 240 * 1000 / BPM
 #define HALF_NOTE 120 * 1000 / BPM
