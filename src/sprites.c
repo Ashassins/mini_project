@@ -2,11 +2,24 @@
 #include "lcd.h"
 #include "util.h"
 
+
+// Draw a sprite at whatever location it wants
 void draw_sprite(Sprite *s) {
   move_sprite(s, 0, 0, 1);
 }
 
-
+/*
+ * Initialize a sprite
+ * uint16_t x: The rightmost pixel
+ * uint16_t y: The bottom most pixel
+ * uint16_t width: The distance from rightmost to leftmost pixel
+ * uint16_t height: The distance from bottom to top pixels
+ * uint16_t *sprite_a: A pointer to the first frame of data for the sprite, must be nonzero,
+ *                    and have at least as much data to fill the bounding box of the sprite
+ * uint16_t *sprite_b: A pointer to the second frame of data for the sprite,i
+ *                    could also be null if it doesn't exist
+ * Sprite *s: A pointer to the sprite to initialize
+ */
 void init_sprite(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t *sprite_a, uint16_t *sprite_b, Sprite *s) {
   s->bbox.x1 = x;
   s->bbox.y1 = y;
@@ -20,7 +33,16 @@ void init_sprite(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16
   s->sprite_data = sprite_a;
 }
 
-// Gonna need this for the tank and others lmao
+/*
+ * Move a sprite to a location relative to it
+ * Will not draw the sprite if any portion is out of screen bounds
+ * Sprite *s: The sprite to move and draw
+ * int16_t mov_x: The amount to move the sprite on the x axis,
+ *                + is to the left, - is to the right
+ * int16_t mov_y: The amount to move the sprite on the y axis,
+ *                + is up, - is down
+ * uint8_t force: Nonzero value will force the redraw
+ */
 void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y, uint8_t force) {
   Rect old, new, hull;
   old = s->bbox;
@@ -65,6 +87,11 @@ void move_sprite(Sprite *s, int16_t mov_x, int16_t mov_y, uint8_t force) {
 
 }
 
+/*
+ * Detect if two sprites are colliding with each other
+ * Return 0 if they are not
+ * Otherwise return their overlap
+ */
 int sprite_coll(Sprite *s1, Sprite *s2) {
     if ((s1->bbox.x1 < 0 || s1->bbox.y1 < 0 || s1->bbox.x2 > LCD_W || s1->bbox.y2 > LCD_H) || (s2->bbox.x1 < 0 || s2->bbox.y1 < 0 || s2->bbox.x2 > LCD_W || s2->bbox.y2 > LCD_H)) {
         return 0;
@@ -72,6 +99,14 @@ int sprite_coll(Sprite *s1, Sprite *s2) {
     return overlap(s1->bbox, s2->bbox);
 }
 
+/*
+ * Teleport a sprite a long distance
+ * will first clear the sprite, then draw it at it's new location
+ *
+ * uint16_t x: The new x coordinate
+ * uint16_t y: The new y coordinate
+ * Sprite *s: The sprite to teleport
+ */
 void teleport_sprite(uint16_t x, uint16_t y, Sprite *s) {
     // x2 = x + width - 1;
     // x2 - x = width - 1;
@@ -86,6 +121,10 @@ void teleport_sprite(uint16_t x, uint16_t y, Sprite *s) {
     draw_sprite(s);
 }
 
+/*
+ * Clears a sprite from the screen
+ * Sprite *s: The sprite to blank out
+ */
 void clear_sprite(Sprite *s) {
   lcddev.select(1);
   LCD_SetWindow(s->bbox.x1, s->bbox.y1, s->bbox.x2, s->bbox.y2);
