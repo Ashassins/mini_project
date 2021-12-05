@@ -25,6 +25,7 @@ extern InvaderArmy invader_army;
 void init_invaders(uint16_t start_x, uint16_t start_y, uint16_t drop, uint16_t step);
 void draw_invaders();
 void update_invaders();
+void move_invaders();
 uint8_t invader_coll(Sprite *s);
 
 #endif
