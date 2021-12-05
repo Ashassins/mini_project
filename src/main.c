@@ -123,18 +123,20 @@ int main(void) {
 
 
         Sprite shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0 + 1)) + 0];
-        if (lightning1.bbox.x1 == 1000) {
-        	teleport_sprite((int)((shooter.bbox.x2 + shooter.bbox.x1) / 2), shooter.bbox.y1 - 10, &lightning1);
-        } else if (lightning1.bbox.x1 != 1000) {
-            move_sprite(&lightning1, 0, -5, 0);
-        }
-        if (lightning1.bbox.y2 <= 25) {
-            teleport_sprite(1000, 1000, &lightning1);
-        }
+        if(shooter.sprite_data != NULL) {
+			if (lightning1.bbox.x1 == 1000) {
+				teleport_sprite((int)((shooter.bbox.x2 + shooter.bbox.x1) / 2), shooter.bbox.y1 - 10, &lightning1);
+			} else if (lightning1.bbox.x1 != 1000) {
+				move_sprite(&lightning1, 0, -5, 0);
+			}
+			if (lightning1.bbox.y2 <= 25) {
+				teleport_sprite(1000, 1000, &lightning1);
+			}
 
-        // Collision test
-        if (sprite_coll(&lightning1, &bunker)) {
-            teleport_sprite(1000, 1000, &lightning1);
+			// Collision test
+			if (sprite_coll(&lightning1, &bunker)) {
+				teleport_sprite(1000, 1000, &lightning1);
+			}
         }
 
 	}
