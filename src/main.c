@@ -119,31 +119,38 @@ int main(void) {
         teleport_sprite(1000, 1000, &shot);
         score += 1;
       }
-        Sprite shooter;
-        for(int i = 0; i < LIGHTNING_CNT; i++) {
-            shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0)) + 0];
-            if(shooter.sprite_data != NULL) {
-                if (bolts[i].bbox.x1 == 1000) {
-                    teleport_sprite((int)((shooter.bbox.x2 + shooter.bbox.x1) / 2), shooter.bbox.y1 - 10, &bolts[i]);
-                }
-            }
-            if (bolts[i].bbox.x1 != 1000) {
-                move_sprite(&bolts[i], 0, -LIGHTNING_SPEED, 0);
-            }
-            if (bolts[i].bbox.y2 <= 25) {
-                teleport_sprite(1000, 1000, &bolts[i]);
-            }
 
-            // Collision test (bumker)
-            /* // old code for bumker test
-            if (sprite_coll(&bolts[i], &bumker)) {
-                teleport_sprite(1000, 1000, &bolts[i]);
-            }//*/
-            if (sprite_coll(&bolts[i], &player)) {
-                teleport_sprite(1000, 1000, &bolts[i]);
-                lives--;
-            }
-        }
+      if (bunker_coll(&shot)) {
+        teleport_sprite(1000, 1000, &shot);
+      }
+
+      Sprite shooter;
+      for(int i = 0; i < LIGHTNING_CNT; i++) {
+          shooter = invader_army.units[(rand() % (INVADERS_COUNT - 0)) + 0];
+          if(shooter.sprite_data != NULL) {
+              if (bolts[i].bbox.x1 == 1000) {
+                  teleport_sprite((int)((shooter.bbox.x2 + shooter.bbox.x1) / 2), shooter.bbox.y1 - 10, &bolts[i]);
+              }
+          }
+          if (bolts[i].bbox.x1 != 1000) {
+              move_sprite(&bolts[i], 0, -LIGHTNING_SPEED, 0);
+          }
+          if (bolts[i].bbox.y2 <= 25) {
+              teleport_sprite(1000, 1000, &bolts[i]);
+          }
+          if (bunker_coll(&bolts[i])) {
+              teleport_sprite(1000, 1000, &bolts[i]);
+          }
+          // Collision test (bumker)
+          /* // old code for bumker test
+          if (sprite_coll(&bolts[i], &bumker)) {
+              teleport_sprite(1000, 1000, &bolts[i]);
+          }//*/
+          if (sprite_coll(&bolts[i], &player)) {
+              teleport_sprite(1000, 1000, &bolts[i]);
+              lives--;
+          }
+      }
       all_dead = 1;
       for (int i = 0; i < INVADERS_COUNT; i++) {
         if (invader_army.units[i].sprite_data != NULL) {

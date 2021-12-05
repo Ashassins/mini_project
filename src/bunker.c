@@ -8,54 +8,71 @@
 #define BUNKER_WINDOW_TOP_Y 121
 #define BUNKER_WINDOW_BOTTOM_X 0
 #define BUNKER_WINDOW_BOTTOM_Y 45
-
-Bunker bunker;
+#define BUNKER_FULL_HEALTH 4
+//Bunker bunker;
 BunkerArray bunkers;
 Sprite clean_bunker;
 
 
-Sprite bunker1;
-Sprite bunker2;
-Sprite bunker3;
-Sprite bunker4;
 //*/
 int _n_bunkers = sizeof(bunkers.bunkerArray) / sizeof(bunkers.cleanBunker);
 // this needs to be a clean bunker
 void init_4_bunkers() { // these x's, y's can be changed later
-    init_sprite(10,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker1);
-    init_sprite(30,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker2);
-    init_sprite(50,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker3);
-    init_sprite(70,45,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &bunker4);
-    draw_sprite(&bunker1);
-    draw_sprite(&bunker2);
-    draw_sprite(&bunker3);
-    draw_sprite(&bunker4);
+    // initialize bunkers
+    for (int i = 0; i < BUNKER_COUNT; i++) {
+        bunkers.bunkerArray[i].id = i;
+        bunkers.bunkerArray[i].hp = BUNKER_FULL_HEALTH;
+        bunkers.bunkerArray[i].x = 10 + 30 * i;
+        bunkers.bunkerArray[i].y = 45;
+        //bunkers.bunkerArray[i].nextBunkerStage. = bunker_dead;//bunker_lightly_damaged;
+        //bunkers.bunkerArray[i].cleanBunker = bunker_clean;
+        init_sprite(bunkers.bunkerArray[i].x,bunkers.bunkerArray[i].y ,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &(bunkers.bunkerArray[i].cleanBunker));
+        init_sprite(bunkers.bunkerArray[i].x,bunkers.bunkerArray[i].y ,bunker_clean_width, bunker_clean_height, (uint16_t*)bunker_clean, (uint16_t*)bunker_clean, &(bunkers.bunkerArray[i].nextBunkerStage));
+        draw_sprite(&(bunkers.bunkerArray[i].cleanBunker));
+    }
 }
 
 void damage_bunker(Bunker bunker) {
-    bunker.hp -= 1;
+    int initial_hp = bunker.hp;
+    if (bunker.hp != 0) {
+        bunker.hp -= 1;
+    }
+    int hp = bunker.hp;
     if (bunker.hp == 4){
-        bunker.nextBunkerStage->sprite_data = bunker_clean;
+        bunker.nextBunkerStage.sprite_data = &bunker_clean;
     } else if (bunker.hp == 3){
-        bunker.nextBunkerStage->sprite_data = bunker_dead;//bunker_lightly_damaged;
+        bunker.nextBunkerStage.sprite_data = &bunker_dead;//bunker_lightly_damaged;
     } else if (bunker.hp == 2){
-        bunker.nextBunkerStage->sprite_data = bunker_dead;//bunker_moderately_damaged;
+        bunker.nextBunkerStage.sprite_data = &bunker_dead;//bunker_moderately_damaged;
     } else if (bunker.hp == 1){
-        bunker.nextBunkerStage->sprite_data = bunker_dead;//bunker_heavily_damaged;
+        bunker.nextBunkerStage.sprite_data = &bunker_dead;//bunker_heavily_damaged;
     } else if (bunker.hp == 0){
-        bunker.nextBunkerStage->sprite_data = bunker_dead; 
-        // clear bbox as well 
+        bunker.nextBunkerStage.sprite_data = &bunker_dead; 
     } //bunker.nextBunkerStage = sprite;
 }
 
-void update_bunker(uint8_t bunkerId, Sprite sprite) {
-    for (int i = 0; i < _n_bunkers; i++) {
-        if (bunkerId == bunkers.bunkerArray[i].id) {
-            damage_bunker(bunkers.bunkerArray[i]);
-            redraw_bunker(bunkerId, bunkers.bunkerArray[i].nextBunkerStage);
-            // redraw specific bunker
+uint8_t bunker_coll(Sprite *shot) {
+    for (int i = 0; i < BUNKER_COUNT; i++) {
+        if (sprite_coll(shot, &(bunkers.bunkerArray[i].cleanBunker)) && (bunkers.bunkerArray[i].hp > 0) && (bunkers.bunkerArray[i].hp <= 4)) {
+            update_bunker(i);
+            return 1;
         }
     }
+    return 0;
+}
+
+void update_bunker(uint8_t bunkerId) {//, Sprite sprite) {
+    //if (i == bunkers.bunkerArray[i].id) {
+        //if (collision) {
+        damage_bunker(bunkers.bunkerArray[bunkerId]);
+        redraw_bunker(&(bunkers.bunkerArray[bunkerId].nextBunkerStage));
+        //}
+        /*
+        else {
+            redraw_bunker(i, &(bunkers.bunkerArray[i].cleanBunker));
+        }
+        // redraw specific bunker*/
+    
 }
 
 void prepDraw() {
@@ -69,20 +86,12 @@ void endDraw() {
     lcddev.select(0);
 }
 
-void redraw_bunker(uint8_t bunkerId, Sprite *nextBunker) {
+void redraw_bunker(Sprite *nextBunker) {
     prepDraw();
-    draw_sprite(nextBunker);
+    draw_sprite(&nextBunker);
     endDraw();
-}
-
-uint8_t bunker_coll(Sprite *shot) {
-    for (int i = 0; i < BUNKER_COUNT; i++) {
-        if (sprite_coll(shot, &(bunkers.bunkerArray[i])) && bunkers.bunkerArray[i].hp != 0) {
-            //damage_bunker();
-            return 1;
-        }
-    }
-    return 0;
+    //bunkers.bunkerArray[i].cleanBunker = bunkers.bunkerArray[i].nextBunkerStage;
+    //bunkers.bunkerArray[i].nextBunkerStage = null;
 }
 
 

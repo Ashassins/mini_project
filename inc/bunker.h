@@ -14,7 +14,8 @@ typedef struct {
     uint8_t hp; // total num hits bunker can take
     //uint16_t width, height; // this will update as the bunker is destroyed
     uint16_t x, y;
-    Sprite *nextBunkerStage;
+    Sprite nextBunkerStage;
+    Sprite cleanBunker;
     //Rect bboxLeft;
     //Rect bboxCenter;
     //Rect bboxRight;
@@ -34,11 +35,14 @@ typedef struct {
 
 void init_4_bunkers();
 void init_bunker(uint16_t x, uint16_t y);
-void damage_bunkers(Bunker bunker);
-void update_bunkers(uint8_t bunkerId);
-void redraw_bunker(uint8_t bunkerId, Sprite *nextBunker);
-void endDraw(); // just for my peace of mind
+Bunker damage_bunkers(Bunker bunker);
+//void update_bunker(uint8_t collision);
+void update_bunker(uint8_t bunkerId);
+//void redraw_bunker(uint8_t bunkerId, Sprite *nextBunker);
+void redraw_bunker(Sprite *nextBunker);
+void endDraw();
 void prepDraw();
+uint8_t bunker_coll(Sprite *shot);
 // [deprecated] 3 rectangles ish
 /* [deprecated]
         |***|
