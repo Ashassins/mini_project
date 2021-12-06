@@ -31,10 +31,10 @@ void print_glbcnt(int x, int y) {
 void draw_score(int x, int y) {
     char output[10] = "SCORE:   ";
     itoa(score, &output[6], 10);
-    char output_2[11] = " LIVES:   ";
-    itoa(lives, &output_2[7], 10);
-    strcat(output, output_2);
     LCD_DrawString(x,y,0xFFFF,0x0000, output, 16, 0);
+    char output_2[10] = "LIVES:   ";
+    itoa(lives, &output_2[7], 10);
+    LCD_DrawString(140,0,0xFFFF,0x0000, output_2, 16, 0);
 }
 
 int main(void) {
@@ -83,7 +83,7 @@ int main(void) {
     if ((glbcnt + 1) % 15 == 0) {
     	// -----4FPS (BASICALLY FREE)-----
 //    	LCD_DrawString(230,300,0x0F00,0x0000, "Don't mind the spaz monke uwu", 16, 0);
-    	draw_score(170,300);
+    	draw_score(140,300);
         // Change ("animate") the test sprite
     	player.sprite_data =
             (uint16_t *)(((uint32_t)player.sprite_data) ^ player.sprite_swap_key);
@@ -190,8 +190,8 @@ int main(void) {
   for (;;) {
     // For ending
       pause_music();
-      draw_score(170,300);
-      if (lives == 0 || inv_comp == 1) {
+      draw_score(140,300);
+      if (lives <= 0 || inv_comp == 1) {
           LCD_DrawString(180,200,0xF000,0x0000, "GAME OVER YOU LOSE!", 16, 0);
       }
       if (all_dead) {
