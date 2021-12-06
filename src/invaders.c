@@ -187,3 +187,18 @@ uint8_t invader_coll(Sprite *shot) {
     }
     return 0;
 }
+
+void clear_invaders() {
+  lcddev.select(1);
+  LCD_SetWindow(invader_army.bbox.x1, invader_army.bbox.y1, invader_army.bbox.x2, invader_army.bbox.y2);
+  LCD_WriteData16_Prepare();
+  for(uint16_t i = invader_army.bbox.y1; i < invader_army.bbox.y2; i++) {
+    for(uint16_t j = invader_army.bbox.x1; j < invader_army.bbox.x2; j++) {
+      LCD_WriteData16(0x0);
+    }
+  }
+  LCD_WriteData16_End();
+  lcddev.select(0);
+}
+
+

@@ -28,5 +28,5 @@ void draw_invaders();
 void update_invaders();
 void move_invaders();
 uint8_t invader_coll(Sprite *s);
-
+void clear_invaders();
 #endif
