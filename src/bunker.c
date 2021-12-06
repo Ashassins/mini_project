@@ -25,13 +25,13 @@ void damage_bunker(Bunker *bunker) {
     if (bunker->hp != 0) {
         bunker->hp -= 1;
     }
-    if (bunker->hp == 4){
+    if (bunker->hp <= 16 && bunker->hp > 12){
         bunker->nextBunkerStage.sprite_data = &bunker_clean;
-    } else if (bunker->hp == 3){
+    } else if (bunker->hp <= 12 && bunker->hp > 8){
         bunker->nextBunkerStage.sprite_data = &bunker_lightly_damaged;
-    } else if (bunker->hp == 2){
+    } else if (bunker->hp <= 8 && bunker->hp > 4){
         bunker->nextBunkerStage.sprite_data = &bunker_moderately_damaged;
-    } else if (bunker->hp == 1){
+    } else if (bunker->hp <= 4 && bunker->hp > 0){
         bunker->nextBunkerStage.sprite_data = &bunker_heavily_damaged;
     } else if (bunker->hp  == 0){
         bunker->nextBunkerStage.sprite_data = &bunker_dead; 
@@ -40,7 +40,7 @@ void damage_bunker(Bunker *bunker) {
 
 uint8_t bunker_coll(Sprite *shot) {
     for (int i = 0; i < BUNKER_COUNT; i++) {
-        if (sprite_coll(shot, &(bunkers.bunkerArray[i].cleanBunker)) && (bunkers.bunkerArray[i].hp > 0) && (bunkers.bunkerArray[i].hp <= 4)) {
+        if (sprite_coll(shot, &(bunkers.bunkerArray[i].cleanBunker)) && (bunkers.bunkerArray[i].hp > 0) && (bunkers.bunkerArray[i].hp <= BUNKER_FULL_HEALTH)) {
             update_bunker(i);
             return 1;
         }
