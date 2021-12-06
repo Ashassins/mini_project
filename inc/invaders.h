@@ -10,6 +10,7 @@
 // Invader a, b, c, + explosion
 #define INVADERS_SPRITE_COUNT 4
 
+extern int score;
 
 typedef struct {
   // The bounding box for the invaders

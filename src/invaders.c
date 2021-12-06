@@ -3,6 +3,7 @@
 #include "sprites.h"
 #include "util.h"
 
+int score = 0;
 InvaderArmy invader_army;
 // This is the number of units in the army
 int _n_units = sizeof(invader_army.units) / sizeof(invader_army.units[0]);
@@ -171,6 +172,13 @@ void move_invaders(){
 uint8_t invader_coll(Sprite *shot) {
     for (int i = 0; i < INVADERS_COUNT; i++) {
         if (sprite_coll(shot, &(invader_army.units[i])) && invader_army.units[i].sprite_data != NULL) {
+            if ((invader_army.units[i].sprite_data == &invader1_a) || (invader_army.units[i].sprite_data == &invader1_b)) {
+                score += 10;
+            } else if ((invader_army.units[i].sprite_data == &invader2_a) || (invader_army.units[i].sprite_data == &invader2_b)) {
+                score += 20;
+            } else if ((invader_army.units[i].sprite_data == &invader3_a) || (invader_army.units[i].sprite_data == &invader3_b)) {
+                score += 30;
+            }
             invader_army.units[i].sprite_data = NULL;
             invader_army.units[i].sprite_swap_key = 0;
             clear_sprite(&invader_army.units[i]);

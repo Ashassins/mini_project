@@ -15,9 +15,11 @@
 #define LIGHTNING_SPEED 5
 #define LIGHTNING_CNT 5
 
-int score = 0;
+int start = 0;
+//int score = 0;
 int lives = 3; // Cannot be more than 9 for now
 int all_dead = 0;
+int inv_comp = 0;
 
 void print_glbcnt(int x, int y) {
   int toggle = 0;
@@ -68,7 +70,16 @@ int main(void) {
   // Init i2c and nunchuk
   //
 //  uint16_t mov_x = 5, mov_y = 5;
-  while (!(all_dead) && lives > 0) {
+  LCD_DrawString(165,250,0x0F00,0x0000, "SPACE INVADERS", 16, 0);
+  LCD_DrawString(180,200,0x0F00,0x0000, "PRESS (C) TO START!", 16, 0);
+  while (!(start)) {
+      if (flg_c) {
+          start = 1;
+      }
+  }
+  LCD_DrawString(165,250,0x0F00,0x0000, "              ", 16, 0);
+  LCD_DrawString(180,200,0x0F00,0x0000, "                   ", 16, 0);
+  while (!(all_dead) && lives > 0 && !(inv_comp)) {
     if ((glbcnt + 1) % 15 == 0) {
     	// -----4FPS (BASICALLY FREE)-----
 //    	LCD_DrawString(230,300,0x0F00,0x0000, "Don't mind the spaz monke uwu", 16, 0);
@@ -90,7 +101,7 @@ int main(void) {
 
     if ((glbcnt + 1) % 4 == 0) {
       // -----15FPS-----
-      print_flags(175, 1);
+//      print_flags(175, 1);
       //        print_glbcnt(230,1);
     }
 
@@ -117,7 +128,6 @@ int main(void) {
       // Collision test
       if (invader_coll(&shot)) {
         teleport_sprite(1000, 1000, &shot);
-        score += 1;
       }
 
       if (bunker_coll(&shot)) {
@@ -157,6 +167,9 @@ int main(void) {
           all_dead = 0;
         }
       }
+      if (invader_army.bbox.y1 < 5) {
+          inv_comp = 1;
+      }
     }
 
     // -----60FPS (VERY COSTLY)-----
@@ -176,8 +189,9 @@ int main(void) {
 
   for (;;) {
     // For ending
+      pause_music();
       draw_score(170,300);
-      if (lives == 0) {
+      if (lives == 0 || inv_comp == 1) {
           LCD_DrawString(180,200,0xF000,0x0000, "GAME OVER YOU LOSE!", 16, 0);
       }
       if (all_dead) {
