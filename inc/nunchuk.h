@@ -1,5 +1,8 @@
 #ifndef NUNCHUK_H
 #define NUNCHUK_H
+
+#include <stdint.h>
+
 #define MID_VAL_X 131
 #define DEAD_ZONE 10
 

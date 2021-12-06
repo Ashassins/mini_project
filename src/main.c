@@ -36,6 +36,8 @@ void handle_shot();
 void handle_invaders();
 void handle_bolt_animate();
 
+uint32_t get_ent();
+
 void print_glbcnt(int x, int y) {
   char output[5] = "G:  ";
   itoa(glbcnt, &output[2], 10);
@@ -58,13 +60,8 @@ int main(void) {
   start_music();
   LCD_Setup();
   LCD_Clear(0x0);
-  // Little test guy
-  //  Sprite invader;
-  //  init_sprite(40, 40, invader1_a_width, invader1_a_height,
-  //  (uint16_t*)invader1_a, (uint16_t*)invader1_b, &invader);
-
   // Setup randomness
-  srand(1);
+  srand(get_ent());
 
   // Init i2c and nunchuk
   //
@@ -239,3 +236,9 @@ void handle_bolt_animate() {
   }
 }
 
+
+uint32_t get_ent() {
+  uint8_t buf[8] = {0};
+  read_nunchuk(buf);
+  return buf[2] << 24 | buf[3] << 16 | buf[4] << 8 | buf[6];
+}
