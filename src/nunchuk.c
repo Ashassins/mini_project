@@ -177,18 +177,6 @@ void nano_wait(unsigned int n) {
       : "r0", "cc");
 }
 
-// void eeprom_blocking_write(uint16_t loc, const char* data, uint8_t len) {
-//    TIM7->CR1 &= ~TIM_CR1_CEN; // Pause keypad scanning.
-//    eeprom_write(loc, data, len);
-//    while (!eeprom_write_complete());
-//    TIM7->CR1 |= TIM_CR1_CEN; // Resume keypad scanning.
-//}
-//
-// void clear_display(void) {
-//    for (int i=0; i < 8; i++) {
-//        msg[i] &= ~0xff;
-//    }
-//}
 
 void init_nunchuk(void) {
   init_i2c();

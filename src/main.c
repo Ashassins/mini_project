@@ -93,6 +93,7 @@ void init_game_data() {
   all_dead = 0;
   inv_comp = 0;
   score = 0;
+  start_music();
 }
 
 void start_screen() {
