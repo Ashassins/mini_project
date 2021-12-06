@@ -8,6 +8,7 @@
 #include "stm32f0xx.h"
 #include "string.h"
 #include "timer.h"
+#include "ufo.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -60,14 +61,12 @@ int main(void) {
   start_music();
   LCD_Setup();
   LCD_Clear(0x0);
+
   // Setup randomness
   srand(get_ent());
 
-  // Init i2c and nunchuk
-  //
-  //  uint16_t mov_x = 5, mov_y = 5;
   start_screen();
-  for(;;) {
+  for (;;) {
     init_game_data();
     game_loop();
     clear_invaders();
@@ -88,7 +87,11 @@ void init_game_data() {
 
   // Initialize the invader army
   init_invaders(0, 230, 5, 2);
-  start=  0;
+
+  // Init the UFO
+  init_ufo();
+
+  start = 0;
   lives = 3;
   all_dead = 0;
   inv_comp = 0;
@@ -119,7 +122,7 @@ void game_loop() {
       update_invaders();
     }
 
-    //if ((glbcnt + 1) % 4 == 0) {
+    // if ((glbcnt + 1) % 4 == 0) {
     //  // -----15FPS-----
     //  //      print_flags(175, 1);
     //  //        print_glbcnt(230,1);
@@ -130,9 +133,10 @@ void game_loop() {
       handle_player_input();
       handle_shot();
       handle_invaders();
+      update_ufo();
     }
 
-    //while ((glbcnt + 1) % 1 != 0)
+    // while ((glbcnt + 1) % 1 != 0)
     //  ;
     asm volatile("wfi" ::);
   }
@@ -151,7 +155,7 @@ void end_screen() {
       LCD_DrawString(180, 250, 0x0F00, 0x0000, "GAME OVER YOU WON!", 16, 0);
       LCD_DrawString(190, 200, 0x0F00, 0x0000, "PRESS (C) TO RE-START", 16, 0);
     }
-    if(flg_c) {
+    if (flg_c) {
       break;
     }
   }
@@ -186,6 +190,17 @@ void handle_shot() {
 
   if (bunker_coll(&shot)) {
     teleport_sprite(1000, 1000, &shot);
+  }
+
+  if(sprite_coll(&shot, &ufo_object.s)) {
+    ufo_object.active = 0;
+    teleport_sprite(1000, 290, &ufo_object.s);
+    score += ufo_object.points;
+    if(ufo_object.dir) {
+      ufo_object.dir = 0;
+    } else {
+      ufo_object.dir = 1;
+    }
   }
 }
 
@@ -227,16 +242,17 @@ void handle_invaders() {
 
 void init_bolts() {
   for (int i = 0; i < LIGHTNING_CNT; i++) {
-  init_sprite(1000, 1000, lightning_a_width, lightning_a_height, (uint16_t *)lightning_a, (uint16_t *)lightning_b, &bolts[i]);
+    init_sprite(1000, 1000, lightning_a_width, lightning_a_height,
+                (uint16_t *)lightning_a, (uint16_t *)lightning_b, &bolts[i]);
   }
 }
 
 void handle_bolt_animate() {
   for (int i = 0; i < LIGHTNING_CNT; i++) {
-    bolts[i].sprite_data = (uint16_t *)(((uint32_t)bolts[i].sprite_data) ^ bolts[i].sprite_swap_key);
+    bolts[i].sprite_data = (uint16_t *)(((uint32_t)bolts[i].sprite_data) ^
+                                        bolts[i].sprite_swap_key);
   }
 }
-
 
 uint32_t get_ent() {
   uint8_t buf[8] = {0};
