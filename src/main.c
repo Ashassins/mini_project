@@ -70,6 +70,7 @@ int main(void) {
     init_game_data();
     game_loop();
     clear_invaders();
+    clear_sprite(&ufo_object.s);
     end_screen();
   }
 }
