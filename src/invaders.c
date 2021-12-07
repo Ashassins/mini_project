@@ -5,6 +5,8 @@
 
 int score = 0;
 InvaderArmy invader_army;
+
+Sprite invader_explosion;
 // This is the number of units in the army
 int _n_units = sizeof(invader_army.units) / sizeof(invader_army.units[0]);
 
@@ -47,6 +49,7 @@ void init_invaders(uint16_t start_x, uint16_t start_y, uint16_t drop, uint16_t s
           &invader_army.units[x + y * INVADERS_WIDTH]);
     }
   }
+  init_sprite(1000, 1000, invader_explode_width, invader_explode_height, (uint16_t *)invader_explode, NULL, &invader_explosion);
 }
 
 // Draw the invaders in place
@@ -181,7 +184,9 @@ uint8_t invader_coll(Sprite *shot) {
             }
             invader_army.units[i].sprite_data = NULL;
             invader_army.units[i].sprite_swap_key = 0;
-            clear_sprite(&invader_army.units[i]);
+            invader_explosion.bbox = invader_army.units[i].bbox;
+            draw_sprite(&invader_explosion);
+            //clear_sprite(&invader_army.units[i]);
             return 1;
         }
     }

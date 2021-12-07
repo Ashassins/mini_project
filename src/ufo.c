@@ -5,16 +5,19 @@
 #include "ufo.h"
 #include "invaders.h"
 #include <stdlib.h>
-
-UFO ufo_object;
 #define UFO_SPAWN 290
 #define UFO_SPEED 3
+Sprite ufo_explosion;
+UFO ufo_object;
+
 void init_ufo(){
   init_sprite(1000, UFO_SPAWN, ufo_width, ufo_height, (uint16_t *) ufo, NULL, &ufo_object.s);
   // Going to the left
   ufo_object.dir = 1;
   ufo_object.active = 0;
   ufo_object.points = 100;
+  init_sprite(150, 1000, invader_explode_width, invader_explode_height, (uint16_t *)invader_explode, NULL, &ufo_explosion);
+
 }
 
 

@@ -4,7 +4,7 @@
 #include "sprite_data.h"
 
 
-
+extern Sprite ufo_explosion;
 typedef struct {
     uint16_t points;
     Sprite s;

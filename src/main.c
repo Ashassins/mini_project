@@ -26,6 +26,8 @@ Sprite player;
 Sprite shot;
 Sprite bolts[LIGHTNING_CNT];
 
+uint8_t ufo_pop = 0;
+
 void init_game_data();
 void init_bolts();
 void start_screen();
@@ -121,6 +123,10 @@ void game_loop() {
       handle_bolt_animate();
       // Animate the army
       update_invaders();
+      if(ufo_pop) {
+        ufo_pop = 0;
+        clear_sprite(&ufo_explosion);
+      }
     }
 
     // if ((glbcnt + 1) % 4 == 0) {
@@ -195,6 +201,9 @@ void handle_shot() {
 
   if(sprite_coll(&shot, &ufo_object.s)) {
     ufo_object.active = 0;
+    ufo_explosion.bbox = ufo_object.s.bbox;
+    draw_sprite(&ufo_explosion);
+    ufo_pop = 1;
     teleport_sprite(1000, 290, &ufo_object.s);
     score += ufo_object.points;
     if(ufo_object.dir) {
