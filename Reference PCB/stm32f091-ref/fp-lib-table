@@ -1,3 +1,0 @@
-(fp_lib_table
-  (lib (name local_models)(type KiCad)(uri ${KIPRJMOD}/models)(options "")(descr ""))
-)
